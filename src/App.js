@@ -6,6 +6,13 @@ import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
+import { Container } from "reactstrap";
+
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import PageHeader from "./layout/PageHeader";
+import MyData from "./screens/MyData";
+
 
 // Configure FirebaseUI.
 const uiConfig = {
@@ -57,11 +64,15 @@ function App() {
 
   // Signed in - Render app
   return (
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/questionnaire" element={<Questionnaire />} />
-      </Routes>
+    <div className="AppContainer">
+      <PageHeader></PageHeader>
+      <Container>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/checkup" element={<Questionnaire />} />
+          <Route path="/my-data" element={<MyData />} />
+        </Routes>
+      </Container>
     </div>
   );
 }

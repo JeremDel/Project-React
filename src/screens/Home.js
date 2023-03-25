@@ -1,5 +1,6 @@
 import firebaseApp from "../initFirebase";
 import { Link } from "react-router-dom";
+import { Button } from "reactstrap";
 
 export default function Home() {
   // Sign out
@@ -13,7 +14,12 @@ export default function Home() {
       <p>
         <Link to="/questionnaire">Go To Questionnaire</Link>
       </p>
-      <button onClick={handleSignOutClick}>Sign Out</button>
+      <p>
+        <Button
+            color="primary"
+            onClick={handleSignOutClick}
+        >Sign Out</Button>
+      </p>
     </div>
   );
 }
