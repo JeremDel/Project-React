@@ -204,6 +204,7 @@
 
 		{
 			"name": "Balance",
+			"type": "singleChoice",
 			"questions": [
 				{
 					"libelle" : "Do you feel confident when you stand on one leg without holding onto something?",
@@ -218,6 +219,7 @@
 
 		{
 			"name": "Painless",
+			"type": "multipleChoice",
 			"questions": [
 				{
 					"libelle" : "Do you have any pain?",
@@ -234,6 +236,7 @@
 		},
 		{
 			"name": "Mobility",
+			"type": "multipleChoice",
 			"questions": [
 				{
 					"libelle" : "Do you have mobility problems in one or more of the following joints?",
