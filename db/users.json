@@ -1,0 +1,21 @@
+{
+  "users":
+  {
+    "UID1": {
+      "lastName": "",
+      "firstName": "",
+      "mail": "",
+      "birthDate": "",
+      "gender": "",
+      "photo": ""
+    },
+    "UID2": {
+      "lastName": "",
+      "firstName": "",
+      "mail": "",
+      "birthDate": "",
+      "gender": "",
+      "photo": ""
+    }
+  }
+}

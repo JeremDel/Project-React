@@ -1,0 +1,23 @@
+{
+  "groups":
+  {
+    "groupID1": {
+      "name": "",
+      "leader": "UID1",
+      "members": [
+        "UID",
+        "UID",
+        "UID"
+      ]
+    },
+    "groupID2": {
+      "name": "",
+      "leader": "UID1",
+      "members": [
+        "UID",
+        "UID",
+        "UID"
+      ]
+    }
+  }
+}
