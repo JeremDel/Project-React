@@ -1,70 +1,101 @@
-import { Link } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Button, Col, Form, FormGroup, Input, Label, Row} from 'reactstrap';
-import React from 'react';
+import {Alert, Button, Col, Form, FormGroup, Input, Label, Row} from 'reactstrap';
+import React, {useEffect, useState} from 'react';
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
-// TODO: change InputForm class into a function so that we can use hooks and store the selected sex value in a shared state by both radio buttons!!
-class InputForm extends React.Component{
-    constructor() {
-        super();
-    }
+function UserForm(){
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [birthdate, setBirthdate] = useState("");
+    const [sex, setSex] = useState("");
 
-    render(){
-        return(
-            <>
-                {!this.props.inverseOrder &&
-                    <Label for={this.props.name}>
-                        {this.props.label}
-                    </Label>
-                }
+    const [showAlert, setShowAlert] = useState(false);
 
-                <Input
-                    name={this.props.name}
-                    placeholder={this.props.placeholder && this.props.placeholder}
-                    type={this.props.type}
-                    value={this.props.value && this.props.value}
-                />
+    useEffect(() => {
 
-                {this.props.inverseOrder &&
-                    <Label for={this.props.name}>
-                        {this.props.label}
-                    </Label>
-                }
-            </>
-        );
-    }
-}
+        // Get current user's id and then get the reference to the db
+        const id = firebase.auth().currentUser.uid;
+        const docRef = firebase.firestore().collection('users').doc(id);
 
-export default function MyData() {
-    let formButton = (event) => {
-        event.preventDefault(); //TODO: change this function...
-        alert("Hey");
-    }
+        // Get the user when the page is loaded
+        docRef.get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data();
+                setFirstName(userData.firstname);
+                setLastName(userData.lastname);
+                setEmail(userData.email);
+                setSex(userData.sex);
+                setBirthdate(userData.birthdate);
+            } else {
+                console.log('No such document!');
+            }
+        }).catch((error) => {
+            console.log('Error getting document:', error);
+        });
+    }, []);
 
-    return (
-        <div>
-            <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
+    const handleSubmit = async(event)  => {
+        event.preventDefault();
 
+        // Get the current user
+        const id = firebase.auth().currentUser.uid;
+        const docRef = firebase.firestore().collection('users').doc(id);
+
+        // Update the user's data
+        docRef.update({
+           firstname: firstName,
+           lastname: lastName,
+           email: email,
+           birthdate: birthdate,
+           sex: sex
+        });
+
+        setShowAlert(true);
+        setTimeout(() => {
+            setShowAlert(false);
+        }, 3000);
+    };
+
+    return(
+        <>
             <Form>
+                <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
+                {
+                    // First row: Firstname and Lastname
+                }
                 <Row>
                     <Col md={6}>
                         <FormGroup>
-                            <InputForm type="text" name="fName" label={"Firstname"} placeholder={"Firstname"}/>
+                            <Label htmlFor={"firstname"}>Firstname</Label>
+                            <Input type="text" name="firstname" placeholder={"Firstname"} value={firstName} onChange={(event) => setFirstName(event.target.value)}/>
                         </FormGroup>
                     </Col>
                     <Col md={6}>
                         <FormGroup>
-                            <InputForm type="text" name="lName" label={"Lastname"} placeholder={"Lastname"}/>
+                            <Label htmlFor={"lastname"}>Lastname</Label>
+                            <Input type="text" name="lastname" placeholder={"Lastname"}  value={lastName} onChange={(event) => setLastName(event.target.value)}/>
                         </FormGroup>
                     </Col>
                 </Row>
+
+                {
+                    // Second row: Email address
+                }
                 <FormGroup>
-                    <InputForm type="email" name="email" label={"Email"} placeholder={"Email"}/>
+                    <Label htmlFor={"email"}>Email</Label>
+                    <Input type="email" name="email" placeholder={"Email"} value={email} onChange={(event) => setEmail(event.target.value)}/>
                 </FormGroup>
+
+                {
+                    // Third row : birthdate and sex
+                }
                 <Row>
                     <Col md={6}>
                         <FormGroup>
-                            <InputForm type="date" name="bdate" label={"Birthdate"} placeholder={"Birthdate"}/>
+                            <Label htmlFor={"birthdate"}>Birthdate</Label>
+                            <Input type="date" name="birthdate" placeholder={"Birthdate"} value={birthdate} onChange={(event) => setBirthdate(event.target.value)}/>
                         </FormGroup>
                     </Col>
                     <Col md={6}>
@@ -74,12 +105,14 @@ export default function MyData() {
                         <Row style={{marginTop: "1.5vh"}}>
                             <Col md={4}>
                                 <FormGroup check>
-                                    <InputForm name={"sex"} type={"radio"} label={"Woman"} inverseOrder={1} value={"Woman"}/>
+                                    <Input name={"sex"} type={"radio"} value={"woman"} checked={sex === "woman"} onChange={(event) => setSex(event.target.value)}/>
+                                    <Label>Woman</Label>
                                 </FormGroup>
                             </Col>
                             <Col md={4}>
                                 <FormGroup check>
-                                    <InputForm name={"sex"} type={"radio"} label={"Man"} inverseOrder={1} value={"Man"}/>
+                                    <Input name={"sex"} type={"radio"} value={"man"} checked={sex === "man"} onChange={(event) => setSex(event.target.value)}/>
+                                    <Label>Man</Label>
                                 </FormGroup>
                             </Col>
                         </Row>
@@ -87,14 +120,20 @@ export default function MyData() {
                 </Row>
 
 
-                <Button color="success" onClick={formButton} style={{marginTop: "1vh", marginBottom: "2vh"}}>
+                <Button onClick={handleSubmit} color="success" type={"submit"} style={{marginTop: "1vh", marginBottom: "2vh"}}>
                     Save changes
                 </Button>
             </Form>
 
-            <p>
-                <Link to="/">Go To The Home Page</Link>
-            </p>
-        </div>
+            {showAlert &&
+                (
+                    <Alert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '50vw'}}>
+                        Data updated successfully !
+                    </Alert>
+                )
+            }
+        </>
     );
 }
+
+export default UserForm;
