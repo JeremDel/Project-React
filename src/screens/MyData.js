@@ -17,10 +17,10 @@ function UserForm(){
 
         // Get current user's id and then get the reference to the db
         const id = firebase.auth().currentUser.uid;
-        const docRef = firebase.firestore().collection('users').doc(id);
+        const user = firebase.firestore().collection('users').doc(id);
 
         // Get the user when the page is loaded
-        docRef.get().then((doc) => {
+        user.get().then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
                 setFirstName(userData.firstname);
@@ -50,12 +50,17 @@ function UserForm(){
            email: email,
            birthdate: birthdate,
            sex: sex
-        });
+        }).then(
+            alertUser
+        );
+    };
 
+    const alertUser = () => {
         setShowAlert(true);
+
         setTimeout(() => {
             setShowAlert(false);
-        }, 3000);
+        }, 2500);
     };
 
     return(
@@ -127,7 +132,7 @@ function UserForm(){
 
             {showAlert &&
                 (
-                    <Alert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '50vw'}}>
+                    <Alert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
                         Data updated successfully !
                     </Alert>
                 )
