@@ -1,5 +1,16 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Alert, Button, Col, Form, FormGroup, Input, Label, Row} from 'reactstrap';
+import {
+    Button,
+    Col,
+    Form,
+    FormGroup,
+    Input,
+    Label,
+    ListGroup,
+    ListGroupItem,
+    Row,
+    UncontrolledAlert
+} from 'reactstrap';
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
@@ -132,13 +143,204 @@ function UserForm(){
 
             {showAlert &&
                 (
-                    <Alert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
+                    <UncontrolledAlert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
                         Data updated successfully !
-                    </Alert>
+                    </UncontrolledAlert>
                 )
             }
         </>
     );
 }
 
-export default UserForm;
+function TeamManagementForm(props){
+    const [isLeader, setLeader] = useState(false);
+    const [groupUid, setGroupUid] = useState('');
+    const [groupName, setGroupName] = useState('');
+    const [members, setMembers] = useState([]);
+
+    const [membersNames, setMembersNames] = useState([]);
+    const[content, setContent] = useState([]);
+
+    const [deletedMember, setDeletedMember] = useState(false);
+    const [email, setEmail] = useState('');
+    const [addedMember, setAddedMember] = useState(false);
+
+    // Get the values of the group if the user is a leader
+    useEffect(() => {
+        const id = firebase.auth().currentUser.uid;
+        const groups = firebase.firestore().collection("groups");
+
+        // We only take the groups where this user is leader (there only should be one group at most!)
+        const query = groups.where('leader', '==', id);
+        query.get().then((group) => {
+            if (!group.empty){
+                // The user is a leader, we store the uid of the group to access it faster later
+                setLeader(true);
+                setGroupUid(group.docs[0].id);
+
+                // Assign the values of the group to the state variables
+                const data = group.docs[0].data();
+                setGroupName(data.name);
+                setMembers(data.members);
+            }
+        }).catch((error) => {
+            console.log('Oh no! There was an error: ', error);
+        });
+    }, []);
+
+    useEffect(() => {
+        // For each member in the members list, get their name and add it to the membersnames list
+        const memberNamePromises = members.map((member) => {
+            const memberRef = firebase.firestore().collection('users').doc(member);
+            return memberRef.get().then((member) => {
+                const memberData = member.data();
+                return memberData.firstname;
+            }).catch((error) => {
+                console.log('Oh no! There was an error: ', error);
+            });
+        });
+
+        Promise.all(memberNamePromises).then((memberNames) => {
+            // Once all member names have been retrieved, update the state variables
+            setMembersNames(memberNames);
+
+            const contentItems = memberNames.map((name, index) => (
+                <>
+                    <Row>
+                        <Col md={9}>
+                            <ListGroupItem key={index}>
+                                {name}
+                            </ListGroupItem>
+                        </Col>
+                        <Col md={3}>
+                            <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
+                                Remove
+                            </Button>
+                        </Col>
+                    </Row>
+                </>
+            ));
+            setContent(contentItems);
+        }).catch((error) => {
+            console.log('Oh no! There was an error: ', error);
+        });
+    }, [members]);
+
+    const deleteMember = (index) => {
+      const newMembers = [...members];
+      newMembers.splice(index, 1);
+      setMembers(newMembers);
+
+      const group = firebase.firestore().collection('groups').doc(groupUid);
+      group.update({
+          members: newMembers
+      }).then(() => {
+          alertDelete();
+      }).catch((exception) => {
+          console.log('Crap! There was an error: ', exception);
+      });
+    };
+
+    const alertDelete = () => {
+        setDeletedMember(true);
+
+        setTimeout(() => {
+            setDeletedMember(false);
+        }, 2500);
+    };
+
+    const addMember = (emailAddress) => {
+        const userCollection = firebase.firestore().collection('users');
+        const query = userCollection.where('email', '==', emailAddress);
+
+        query.get().then((users) => {
+            if(!users.empty){
+                const uid = users.docs[0].id;
+                const updatedMembers = [...members, uid];
+                setMembers(updatedMembers);
+
+                const groupRef = firebase.firestore().collection('groups').doc(groupUid);
+                groupRef.update({
+                    members: updatedMembers
+                }).then(() => {
+                    notifyAdd();
+                }).catch((exception) => {
+                    console.log('Oh no! There was an error: ', exception);
+                });
+            }
+        });
+    };
+
+    const notifyAdd = () => {
+      setAddedMember(true);
+
+      setTimeout(() => {
+          setAddedMember(false);
+      }, 2500);
+    };
+
+
+    return(
+        <>
+            {
+                isLeader &&
+                (
+                    <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {groupName}</h3>
+                )
+            }
+            <ListGroup>
+                {
+                    isLeader &&
+                    (
+                        content
+                    )
+                }
+                {
+                    isLeader &&
+                    (
+                        <>
+                            <Row style={{marginTop: '2vh'}}>
+                                <Col md={9}>
+                                    <Input type={"email"} placeholder={"New member's email address"} onChange={(event) => {setEmail(event.target.value)}}/>
+                                </Col>
+                                <Col md={3}>
+                                    <Button color={"success"} style={{width: '100%'}} onClick={() => {addMember(email)}}>Add member</Button>
+                                </Col>
+                            </Row>
+                        </>
+                    )
+                }
+                {
+                    deletedMember &&
+                    (
+                        <UncontrolledAlert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
+                            Group member deleted successfully
+                        </UncontrolledAlert>
+                    )
+                }
+                {
+                    addedMember &&
+                    (
+                        <UncontrolledAlert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
+                            Group member added successfully
+                        </UncontrolledAlert>
+                    )
+                }
+            </ListGroup>
+        </>
+    );
+}
+
+export default function MyFunction(){
+
+    return(
+        <>
+            <UserForm/>
+            <Row>
+                <Col md={6}>
+                    <TeamManagementForm/>
+                </Col>
+            </Row>
+        </>
+    );
+}
