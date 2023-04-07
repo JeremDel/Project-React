@@ -152,6 +152,14 @@ function UserForm(){
     );
 }
 
+function CustomAlert(props){
+    return(
+        <UncontrolledAlert color={props.color} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
+            {props.message}
+        </UncontrolledAlert>
+    );
+}
+
 function TeamManagementForm(props){
     const [isLeader, setLeader] = useState(false);
     const [groupUid, setGroupUid] = useState('');
@@ -161,9 +169,10 @@ function TeamManagementForm(props){
     const [membersNames, setMembersNames] = useState([]);
     const[content, setContent] = useState([]);
 
-    const [deletedMember, setDeletedMember] = useState(false);
     const [email, setEmail] = useState('');
-    const [addedMember, setAddedMember] = useState(false);
+
+    const[alert, setAlert] = useState(<></>);
+    const[alertVisible, setAlertVisible] = useState(false);
 
     // Get the values of the group if the user is a leader
     useEffect(() => {
@@ -235,18 +244,11 @@ function TeamManagementForm(props){
       group.update({
           members: newMembers
       }).then(() => {
-          alertDelete();
+          setAlert(<CustomAlert color={"info"} message={"Member removed successfully"}/>);
+          notifyUser();
       }).catch((exception) => {
           console.log('Crap! There was an error: ', exception);
       });
-    };
-
-    const alertDelete = () => {
-        setDeletedMember(true);
-
-        setTimeout(() => {
-            setDeletedMember(false);
-        }, 2500);
     };
 
     const addMember = (emailAddress) => {
@@ -256,27 +258,41 @@ function TeamManagementForm(props){
         query.get().then((users) => {
             if(!users.empty){
                 const uid = users.docs[0].id;
-                const updatedMembers = [...members, uid];
-                setMembers(updatedMembers);
 
-                const groupRef = firebase.firestore().collection('groups').doc(groupUid);
-                groupRef.update({
-                    members: updatedMembers
-                }).then(() => {
-                    notifyAdd();
-                    setEmail('');
-                }).catch((exception) => {
-                    console.log('Oh no! There was an error: ', exception);
+                let newMember = true;
+                members.forEach((member) => {
+                    if(member === uid)
+                        newMember = false;
                 });
+
+                if(newMember){
+                    const updatedMembers = [...members, uid];
+                    setMembers(updatedMembers);
+
+                    const groupRef = firebase.firestore().collection('groups').doc(groupUid);
+                    groupRef.update({
+                        members: updatedMembers
+                    }).then(() => {
+                        setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
+                        notifyUser();
+                        setEmail('');
+                    }).catch((exception) => {
+                        console.log('Oh no! There was an error: ', exception);
+                    });
+                } else {
+                    setAlert(<CustomAlert color={"danger"} message={"Member is already in the group!"}/>);
+                    notifyUser();
+                    setEmail('');
+                }
             }
         });
     };
 
-    const notifyAdd = () => {
-      setAddedMember(true);
+    const notifyUser = () => {
+      setAlertVisible(true);
 
       setTimeout(() => {
-          setAddedMember(false);
+          setAlertVisible(false);
       }, 2500);
     };
 
@@ -312,19 +328,9 @@ function TeamManagementForm(props){
                     )
                 }
                 {
-                    deletedMember &&
+                    alertVisible &&
                     (
-                        <UncontrolledAlert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
-                            Group member deleted successfully
-                        </UncontrolledAlert>
-                    )
-                }
-                {
-                    addedMember &&
-                    (
-                        <UncontrolledAlert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
-                            Group member added successfully
-                        </UncontrolledAlert>
+                        alert
                     )
                 }
             </ListGroup>
