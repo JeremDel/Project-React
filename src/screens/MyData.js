@@ -264,6 +264,7 @@ function TeamManagementForm(props){
                     members: updatedMembers
                 }).then(() => {
                     notifyAdd();
+                    setEmail('');
                 }).catch((exception) => {
                     console.log('Oh no! There was an error: ', exception);
                 });
@@ -301,7 +302,7 @@ function TeamManagementForm(props){
                         <>
                             <Row style={{marginTop: '2vh'}}>
                                 <Col md={9}>
-                                    <Input type={"email"} placeholder={"New member's email address"} onChange={(event) => {setEmail(event.target.value)}}/>
+                                    <Input type={"email"} placeholder={"New member's email address"} value={email} onChange={(event) => {setEmail(event.target.value)}}/>
                                 </Col>
                                 <Col md={3}>
                                     <Button color={"success"} style={{width: '100%'}} onClick={() => {addMember(email)}}>Add member</Button>
