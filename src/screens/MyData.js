@@ -15,6 +15,14 @@ import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 
+function CustomAlert(props){
+    return(
+        <UncontrolledAlert color={props.color} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
+            {props.message}
+        </UncontrolledAlert>
+    );
+}
+
 function UserForm(){
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -23,6 +31,7 @@ function UserForm(){
     const [sex, setSex] = useState("");
 
     const [showAlert, setShowAlert] = useState(false);
+    const [alert, setAlert] = useState(<></>);
 
     useEffect(() => {
 
@@ -61,9 +70,14 @@ function UserForm(){
            email: email,
            birthdate: birthdate,
            sex: sex
-        }).then(
-            alertUser
-        );
+        }).then(() => {
+            setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
+            alertUser();
+        }).catch((exception) => {
+            console.log("Oh no! There was an error: ", exception);
+            setAlert(<CustomAlert color={"danger"} message={"There was an error while updating your data, please try again later"} />);
+            alertUser();
+        });
     };
 
     const alertUser = () => {
@@ -143,20 +157,10 @@ function UserForm(){
 
             {showAlert &&
                 (
-                    <UncontrolledAlert color={"info"} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
-                        Data updated successfully !
-                    </UncontrolledAlert>
+                    alert
                 )
             }
         </>
-    );
-}
-
-function CustomAlert(props){
-    return(
-        <UncontrolledAlert color={props.color} style={{position: 'absolute', bottom: '5vh', left: 0, right: 0, margin: 'auto', width: '75vw'}}>
-            {props.message}
-        </UncontrolledAlert>
     );
 }
 
