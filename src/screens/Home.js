@@ -14,15 +14,18 @@ const Home = ({ uiConfig }) => {
 
     return (
         <div className="home-container">
+            <div className="home-image">
+                <img src="accueil_sport.jpeg" alt="sport" />
+            </div>
             <div className="home-text">
-            <h1>Welcome to the Fitness Check !</h1>
-            <p>
-                <h2>Please, <span onClick={handleLoginClick} style={{ cursor: 'pointer', textDecoration: 'underline' }}>log in</span> or{' '}
-                    <Link to="/signup">sign up for free</Link> in order to access the health checkup.
-                </h2>
-                {showAuth && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />}
-            </p>
-        </div>
+                <h1>Welcome to the Fitness Check !</h1>
+                <p>
+                    <h2>Please, <span onClick={handleLoginClick} style={{ cursor: 'pointer', textDecoration: 'underline' }}>log in</span> or{' '}
+                        <Link to="/signup">sign up for free</Link> in order to access the health checkup.
+                    </h2>
+                    {showAuth && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />}
+                </p>
+            </div>
         </div>
     );
 };

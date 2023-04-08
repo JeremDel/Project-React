@@ -4,13 +4,25 @@ body {
 
 .home-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    align-items: flex-end;
     height: 100vh;
     background-color: #f2f2f2;
 }
 
+.home-image {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+.home-image img {
+    width: 80%;
+}
+
 .home-text {
+    text-align: center;
     color: black;
     font-family: "Courier New", Courier, monospace;
     font-size: 40px;
