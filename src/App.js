@@ -3,15 +3,13 @@ import firebase from "firebase/compat/app";
 import firebaseApp from "./initFirebase";
 import { StyledFirebaseAuth } from "react-firebaseui";
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
 import { Container } from "reactstrap";
-
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 
 // Configure FirebaseUI.
@@ -52,29 +50,31 @@ function App() {
   }
 
   // Not signed in - Render auth screen
-  if (!isSignedIn)
-    return (
-      <div className="App">
-        <StyledFirebaseAuth
-          uiConfig={uiConfig}
-          firebaseAuth={firebaseApp.auth()}
-        />
-      </div>
-    );
+    if (!isSignedIn)
+        return (
+            <div className="App">
+                <Routes>
+                    <Route path="/" element={<Home uiConfig={uiConfig} />} />
+                    <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />} />
+                    <Route path="/signup" element={<MyData />} />
+                </Routes>
+                <Navigate to="/" />
+            </div>
+        );
 
   // Signed in - Render app
-  return (
-    <div className="AppContainer">
-      <PageHeader></PageHeader>
-      <Container>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/checkup" element={<Questionnaire />} />
-          <Route path="/my-data" element={<MyData />} />
-        </Routes>
-      </Container>
-    </div>
-  );
+    return (
+        <div className="AppContainer">
+            <PageHeader></PageHeader>
+            <Container>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/checkup" element={<Questionnaire />} />
+                    <Route path="/my-data" element={<MyData />} />
+                </Routes>
+            </Container>
+        </div>
+    );
 }
 
 export default App;

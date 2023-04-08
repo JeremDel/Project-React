@@ -1,25 +1,30 @@
+import React, { useState } from 'react';
 import firebaseApp from "../initFirebase";
 import { Link } from "react-router-dom";
 import { Button } from "reactstrap";
+import { StyledFirebaseAuth } from 'react-firebaseui';
+import './Home.css';
 
-export default function Home() {
-  // Sign out
-  const handleSignOutClick = async () => {
-    await firebaseApp.auth().signOut();
-  };
+const Home = ({ uiConfig }) => {
+    const [showAuth, setShowAuth] = useState(false);
 
-  return (
-    <div>
-      <h1>Welcome to the Fitness Check!</h1>
-      <p>
-        <Link to="/questionnaire">Go To Questionnaire</Link>
-      </p>
-      <p>
-        <Button
-            color="primary"
-            onClick={handleSignOutClick}
-        >Sign Out</Button>
-      </p>
-    </div>
-  );
-}
+    const handleLoginClick = () => {
+        setShowAuth(!showAuth);
+    };
+
+    return (
+        <div className="home-container">
+            <div className="home-text">
+            <h1>Welcome to the Fitness Check !</h1>
+            <p>
+                <h2>Please, <span onClick={handleLoginClick} style={{ cursor: 'pointer', textDecoration: 'underline' }}>log in</span> or{' '}
+                    <Link to="/signup">sign up for free</Link> in order to access the health checkup.
+                </h2>
+                {showAuth && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />}
+            </p>
+        </div>
+        </div>
+    );
+};
+
+export default Home;
