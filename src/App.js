@@ -50,17 +50,18 @@ function App() {
   }
 
   // Not signed in - Render auth screen
-    if (!isSignedIn)
+    if (!isSignedIn) {
         return (
             <div className="App">
                 <Routes>
                     <Route path="/" element={<Home uiConfig={uiConfig} />} />
                     <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />} />
                     <Route path="/signup" element={<MyData />} />
+                    <Route path="/*" element={<Navigate to="/" />} />
                 </Routes>
-                <Navigate to="/" />
             </div>
         );
+    }
 
   // Signed in - Render app
     return (
