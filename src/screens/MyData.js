@@ -5,7 +5,9 @@ import firebaseApp from "../initFirebase"; // Import firebaseApp instead of init
 import { useNavigate } from "react-router-dom";
 import "./MyData.css";
 
+// The MyData component is responsible for rendering the registration form for new users.
 const MyData = () => {
+    // State hook to manage the form data entered by the user
     const [formData, setFormData] = useState({
         firstname: "",
         lastname: "",
@@ -16,29 +18,37 @@ const MyData = () => {
         repeatPassword: "",
     });
 
+    // Hook to navigate to different routes in the application
     const navigate = useNavigate();
 
+    // Handle change event of the form inputs
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Handle submit event of the form
     const handleSubmit = async (e) => {
         e.preventDefault();
+        // Check if passwords match
         if (formData.password !== formData.repeatPassword) {
             alert("Passwords don't match");
             return;
         }
 
         try {
+            // Create a new user with email and password
             await firebaseApp
                 .auth()
                 .createUserWithEmailAndPassword(formData.email, formData.password);
+            // Get the current user
             const user = firebase.auth().currentUser;
+            // Update the user's display name
             await user.updateProfile({
                 displayName: `${formData.firstname} ${formData.lastname}`,
             });
-            // Save other user data to your database as needed
 
+
+            // Navigate to the homepage
             navigate("/");
         } catch (error) {
             alert(error.message);
@@ -93,6 +103,7 @@ const MyData = () => {
                     </label>
                     <div className="sex">
                         <span>Sex:</span>
+                        {/* Radio buttons for selecting the user's sex */}
                         <label>
                             <input
                                 type="radio"
@@ -115,6 +126,7 @@ const MyData = () => {
                 </div>
                 <label>
                     Password
+                    {/* Input for entering password */}
                     <input
                         type="password"
                         name="password"
@@ -124,6 +136,7 @@ const MyData = () => {
                 </label>
                 <label>
                     Repeat password:
+                    {/* Input for re-entering password */}
                     <input
                         type="password"
                         name="repeatPassword"
@@ -133,8 +146,10 @@ const MyData = () => {
                 </label>
                 <label>
                     Profile picture:
+                    {/* Input for uploading a profile picture */}
                     <input type="file" name="profilePicture" />
                 </label>
+                {/* Submit button */}
                 <button type="submit">Register</button>
             </form>
         </div>
