@@ -164,7 +164,7 @@ function UserForm(){
     );
 }
 
-function TeamManagementForm(props){
+function TeamManagementForm(){
     const [isLeader, setLeader] = useState(false);
     const [groupUid, setGroupUid] = useState('');
     const [groupName, setGroupName] = useState('');
@@ -177,6 +177,8 @@ function TeamManagementForm(props){
 
     const[alert, setAlert] = useState(<></>);
     const[alertVisible, setAlertVisible] = useState(false);
+
+    const[userAvailable, setUserAvailable] = useState(true);
 
     // Get the values of the group if the user is a leader
     useEffect(() => {
@@ -256,20 +258,31 @@ function TeamManagementForm(props){
     };
 
     const addMember = (emailAddress) => {
+        // Get the user by his email address
         const userCollection = firebase.firestore().collection('users');
         const query = userCollection.where('email', '==', emailAddress);
 
         query.get().then((users) => {
             if(!users.empty){
+                // Get his uid
                 const uid = users.docs[0].id;
 
-                let newMember = true;
-                members.forEach((member) => {
-                    if(member === uid)
-                        newMember = false;
+                // Check that he's not already in a group
+                const groupCollection = firebase.firestore().collection('groups');
+                const groupQuery = groupCollection.where('members', "array-contains", uid);
+
+                groupQuery.get().then((group) => {
+                    if (!group.empty){
+                        setUserAvailable(false);
+                        console.log('Got im!');
+                    } else {
+                        setUserAvailable(true);
+                    }
+                }).catch((exception) => {
+                    console.log('Oh no! There was an error: ', exception);
                 });
 
-                if(newMember){
+                if(userAvailable){
                     const updatedMembers = [...members, uid];
                     setMembers(updatedMembers);
 
@@ -284,7 +297,7 @@ function TeamManagementForm(props){
                         console.log('Oh no! There was an error: ', exception);
                     });
                 } else {
-                    setAlert(<CustomAlert color={"danger"} message={"Member is already in the group!"}/>);
+                    setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
                     notifyUser();
                     setEmail('');
                 }
@@ -316,6 +329,7 @@ function TeamManagementForm(props){
                         content
                     )
                 }
+            </ListGroup>
                 {
                     isLeader &&
                     (
@@ -337,7 +351,6 @@ function TeamManagementForm(props){
                         alert
                     )
                 }
-            </ListGroup>
         </>
     );
 }
