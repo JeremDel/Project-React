@@ -190,7 +190,7 @@ function UserForm(){
                 </Row>
 
 
-                <Button onClick={handleSubmit} color="success" type={"submit"} style={{marginTop: "1vh", marginBottom: "2vh"}}>
+                <Button disabled={password.length === 0} onClick={handleSubmit} color="success" type={"submit"} style={{marginTop: "1vh", marginBottom: "2vh"}}>
                     Save changes
                 </Button>
             </Form>
