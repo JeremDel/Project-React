@@ -29,6 +29,7 @@ function UserForm(){
     const [email, setEmail] = useState("");
     const [birthdate, setBirthdate] = useState("");
     const [sex, setSex] = useState("");
+    const [password, setPassword] = useState("");
 
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState(<></>);
@@ -63,13 +64,38 @@ function UserForm(){
         const id = firebase.auth().currentUser.uid;
         const docRef = firebase.firestore().collection('users').doc(id);
 
-        // Update the user's data
+        const user = firebase.auth().currentUser;
+        const auth = firebase.auth();
+        const credential = firebase.auth.EmailAuthProvider.credential(
+            user.email,
+            password
+        );
+
+        user.reauthenticateWithCredential(credential).then(() => {
+            user.updateEmail(email).then(() => {
+            }).catch((exception) => {
+                console.log(exception);
+            });
+        }).catch((exception) => {
+            console.log(exception);
+        });
+
+        // Update display name
+        auth.currentUser.updateProfile({
+            displayName: firstName + " " + lastName
+        }).then(() => {
+
+        }).catch((exception) => {
+            console.log(exception);
+        });
+
+        // Update users collection
         docRef.update({
-           firstname: firstName,
-           lastname: lastName,
-           email: email,
-           birthdate: birthdate,
-           sex: sex
+            firstname: firstName,
+            lastname: lastName,
+            email: email,
+            birthdate: birthdate,
+            sex: sex
         }).then(() => {
             setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
             alertUser();
@@ -77,6 +103,8 @@ function UserForm(){
             console.log("Oh no! There was an error: ", exception);
             setAlert(<CustomAlert color={"danger"} message={"There was an error while updating your data, please try again later"} />);
             alertUser();
+        }).finally(() => {
+            setPassword("");
         });
     };
 
@@ -146,6 +174,18 @@ function UserForm(){
                                 </FormGroup>
                             </Col>
                         </Row>
+                    </Col>
+                </Row>
+
+                {
+                    // Last row: password for security
+                }
+                <Row>
+                    <Col md={6}>
+                        <FormGroup>
+                            <Label htmlFor={"password"}>For security reasons, please insert your password</Label>
+                            <Input name={"password"} type={"password"} value={password} onChange={(event) => {setPassword(event.target.value)}}/>
+                        </FormGroup>
                     </Col>
                 </Row>
 
