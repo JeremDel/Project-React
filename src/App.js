@@ -11,51 +11,61 @@ import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-
-// Configure FirebaseUI.
-const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: "popup",
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-  callbacks: {
-    // Avoid redirects after sign-in.
-    signInSuccessWithAuthResult: () => false,
-  },
-};
-
 function App() {
-  // Local signed-in state.
-  const [isSignedIn, setIsSignedIn] = useState(null);
+    // Local signed-in state.
+    const [isSignedIn, setIsSignedIn] = useState(null);
+    const [error, setError] = useState(null); // Add error state
 
-  // Listen to the Firebase Auth state and set the local state.
-  useEffect(() => {
-    const unregisterAuthObserver = firebaseApp
-      .auth()
-      .onAuthStateChanged((user) => {
-        setIsSignedIn(!!user);
-      });
+    // Handle sign-in errors and set the error state.
+    const handleSignInError = (error) => {
+        if (error.code === 'auth/user-not-found') {
+            setError("This email doesn't exist");
+        } else {
+            setError(error.message);
+        }
+    };
 
-    // Make sure we un-register Firebase observers when the component unmounts.
-    return () => unregisterAuthObserver();
-  }, []);
+    // Configure FirebaseUI.
+    const uiConfig = {
+        // Popup signin flow rather than redirect flow.
+        signInFlow: "popup",
+        // We will display Google and Facebook as auth providers.
+        signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+        callbacks: {
+            // Avoid redirects after sign-in.
+            signInSuccessWithAuthResult: () => false,
+            signInFailure: handleSignInError,
+        },
+    };
 
-  // Not initialized yet - Render loading message
-  if (isSignedIn === null) {
-    return (
-      <div className="App">
-        <p>Loading...</p>
-      </div>
-    );
-  }
+    // Listen to the Firebase Auth state and set the local state.
+    useEffect(() => {
+        const unregisterAuthObserver = firebaseApp
+            .auth()
+            .onAuthStateChanged((user) => {
+                setIsSignedIn(!!user);
+            });
 
-  // Not signed in - Render auth screen
+        // Make sure we un-register Firebase observers when the component unmounts.
+        return () => unregisterAuthObserver();
+    }, []);
+
+    // Not initialized yet - Render loading message
+    if (isSignedIn === null) {
+        return (
+            <div className="App">
+                <p>Loading...</p>
+            </div>
+        );
+    }
+
+    // Not signed in - Render auth screen
     if (!isSignedIn) {
         return (
             <div className="App">
                 <Routes>
-                    <Route path="/" element={<Home uiConfig={uiConfig} />} />
-                    <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />} />
+                    <Route path="/" element={<Home uiConfig={uiConfig} signInError={error} />} /> {/* Transmettez signInError ici */}
+                    <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} signInFailure={handleSignInError} />} />
                     <Route path="/signup" element={<MyData />} />
                     <Route path="/*" element={<Navigate to="/" />} />
                 </Routes>
@@ -63,7 +73,7 @@ function App() {
         );
     }
 
-  // Signed in - Render app
+    // Signed in - Render app
     return (
         <div className="AppContainer">
             <PageHeader></PageHeader>
