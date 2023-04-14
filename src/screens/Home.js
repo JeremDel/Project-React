@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // Ajoutez cette ligne
 import firebaseApp from "../initFirebase";
 import { Button } from "reactstrap";
 import { StyledFirebaseAuth } from 'react-firebaseui';
 import './Home.css';
 
-const Home = ({ uiConfig, signInError }) => { // Ajoutez signInError en tant que prop
+
+// The Home component is responsible for rendering the homepage of the application and providing the option for users to log in or sign up.
+const Home = ({ uiConfig }) => {
     // State hook to manage the visibility of the authentication UI
     const [showAuth, setShowAuth] = useState(false);
     // Hook to navigate to different routes in the application
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // Ajoutez cette ligne
 
     // Handle the click event of the log in button
     const handleLoginClick = () => {
@@ -30,7 +32,6 @@ const Home = ({ uiConfig, signInError }) => { // Ajoutez signInError en tant que
                     {/* Render the authentication UI if showAuth is true */}
                     {showAuth && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />}
                 </p>
-                {signInError && <p style={{ color: "red" }}>{signInError}</p>} {/* Affichez le message d'erreur ici */}
             </div>
         </div>
     );
