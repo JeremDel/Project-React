@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import firebaseApp from "../initFirebase"; // Import firebaseApp instead of initFirebase
+import "firebase/compat/firestore"; // Import Firestore
+import firebaseApp from "../initFirebase";
 import { useNavigate } from "react-router-dom";
 import "./MyData.css";
 
-// The MyData component is responsible for rendering the registration form for new users.
 const MyData = () => {
-    // State hook to manage the form data entered by the user
     const [formData, setFormData] = useState({
         firstname: "",
         lastname: "",
@@ -18,43 +17,54 @@ const MyData = () => {
         repeatPassword: "",
     });
 
-    // Hook to navigate to different routes in the application
     const navigate = useNavigate();
 
-    // Handle change event of the form inputs
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // Handle submit event of the form
+    const saveUserDataToFirestore = async (userId, userData) => {
+        try {
+            await firebaseApp.firestore().collection('users').doc(userId).set(userData);
+            console.log("User data saved to Firestore");
+        } catch (error) {
+            console.error("Error saving user data to Firestore: ", error);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        // Check if passwords match
+
         if (formData.password !== formData.repeatPassword) {
             alert("Passwords don't match");
             return;
         }
 
         try {
-            // Create a new user with email and password
-            await firebaseApp
+            const userCredential = await firebaseApp
                 .auth()
                 .createUserWithEmailAndPassword(formData.email, formData.password);
-            // Get the current user
-            const user = firebase.auth().currentUser;
-            // Update the user's display name
+
+            const user = userCredential.user;
+
             await user.updateProfile({
                 displayName: `${formData.firstname} ${formData.lastname}`,
             });
 
+            const userData = {
+                firstname: formData.firstname,
+                lastname: formData.lastname,
+                email: formData.email,
+                birthdate: formData.birthdate,
+                sex: formData.sex,
+            };
+            await saveUserDataToFirestore(user.uid, userData);
 
-            // Navigate to the homepage
             navigate("/");
         } catch (error) {
             alert(error.message);
         }
     };
-
     return (
         <div>
             <h2>Hi new member !</h2>
