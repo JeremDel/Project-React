@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import "./MyData.css";
 
 const MyData = () => {
+    // Initialize state for form data
     const [formData, setFormData] = useState({
         firstname: "",
         lastname: "",
@@ -19,10 +20,12 @@ const MyData = () => {
 
     const navigate = useNavigate();
 
+    // Update form data when inputs change
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Save user data to Firestore
     const saveUserDataToFirestore = async (userId, userData) => {
         try {
             await firebaseApp.firestore().collection('users').doc(userId).set(userData);
@@ -32,25 +35,32 @@ const MyData = () => {
         }
     };
 
+
+    // Handle form submission and create a new user with the entered data
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+
+        // Check if passwords match
         if (formData.password !== formData.repeatPassword) {
             alert("Passwords don't match");
             return;
         }
 
         try {
+            // Create a new user with the email and password
             const userCredential = await firebaseApp
                 .auth()
                 .createUserWithEmailAndPassword(formData.email, formData.password);
 
             const user = userCredential.user;
 
+            // Update the user's display name
             await user.updateProfile({
                 displayName: `${formData.firstname} ${formData.lastname}`,
             });
 
+            // Save user data to Firestore
             const userData = {
                 firstname: formData.firstname,
                 lastname: formData.lastname,
@@ -60,11 +70,13 @@ const MyData = () => {
             };
             await saveUserDataToFirestore(user.uid, userData);
 
+            // Redirect to home page after successful registration
             navigate("/");
         } catch (error) {
             alert(error.message);
         }
     };
+    // Render the registration form
     return (
         <div>
             <h2>Hi new member !</h2>

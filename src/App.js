@@ -11,25 +11,12 @@ import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-
-// Configure FirebaseUI.
-const uiConfig = {
-    // Popup signin flow rather than redirect flow.
-    signInFlow: "popup",
-    // We will display Google and Facebook as auth providers.
-    signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-    callbacks: {
-        // Avoid redirects after sign-in.
-        signInSuccessWithAuthResult: () => false,
-    },
-};
-
 function App() {
-    // Local signed-in state.
+    // Initialize local states for signed-in status and errors
     const [isSignedIn, setIsSignedIn] = useState(null);
-    const [error, setError] = useState(null); // Add error state
+    const [error, setError] = useState(null);
 
-    // Listen to the Firebase Auth state and set the local state.
+    // Listen to the Firebase Auth state and update the local signed-in state accordingly
     useEffect(() => {
         const unregisterAuthObserver = firebaseApp
             .auth()
@@ -37,16 +24,43 @@ function App() {
                 setIsSignedIn(!!user);
             });
 
-        // Make sure we un-register Firebase observers when the component unmounts.
+        // Clean up Firebase observers when the component unmounts
         return () => unregisterAuthObserver();
     }, []);
 
-    // Handle sign-in errors and set the error state.
-    const handleSignInError = (error) => {
-        setError(error.message);
+    // Function to check if the user exists in the database
+    const userExists = async (user) => {
+        const db = firebaseApp.firestore();
+        const userRef = db.collection('users').doc(user.uid);
+        const doc = await userRef.get();
+        return doc.exists;
     };
 
-    // Not initialized yet - Render loading message
+    // Configure FirebaseUI with desired settings for sign-in flow and providers
+    const uiConfig = {
+        // Popup signin flow rather than redirect flow.
+        signInFlow: "popup",
+
+        signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+        callbacks: {
+            // Customize the sign-in success callback
+            signInSuccessWithAuthResult: async (authResult, redirectUrl) => {
+                const exists = await userExists(authResult.user);
+                if (exists) {
+                    // User exists, continue with the default behavior (no redirect)
+                    return false;
+                } else {
+                    // User does not exist, display an error message
+                    setError("L'utilisateur n'existe pas.");
+                    // Sign out the user
+                    firebaseApp.auth().signOut();
+                    return false;
+                }
+            },
+        },
+    };
+
+    // Display loading message if the signed-in state is not initialized
     if (isSignedIn === null) {
         return (
             <div className="App">
@@ -55,14 +69,14 @@ function App() {
         );
     }
 
-    // Not signed in - Render auth screen
+    // Display the authentication screen if the user is not signed in
     if (!isSignedIn) {
         return (
             <div className="App">
                 <Routes>
                     <Route path="/" element={<Home uiConfig={uiConfig} />} />
-                    <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} signInFailure={handleSignInError} />} />
-                    {error && <p style={{ color: "red" }}>{error}</p>} {/* Display error message */}
+                    <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />} />
+                    {error && <p style={{ color: "red" }}>{error}</p>}
                     <Route path="/signup" element={<MyData />} />
                     <Route path="/*" element={<Navigate to="/" />} />
                 </Routes>
@@ -70,7 +84,7 @@ function App() {
         );
     }
 
-    // Signed in - Render app
+    // Render the main application when the user is signed in
     return (
         <div className="AppContainer">
             <PageHeader></PageHeader>
