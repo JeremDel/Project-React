@@ -14,6 +14,7 @@ import {
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
 function CustomAlert(props){
     return(
@@ -30,6 +31,8 @@ function UserForm(){
     const [birthdate, setBirthdate] = useState("");
     const [sex, setSex] = useState("");
     const [password, setPassword] = useState("");
+    const [pfp, setPfp] = useState(null);
+    const [pfpUrl, setPfpUrl] = useState("");
 
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState(<></>);
@@ -44,11 +47,13 @@ function UserForm(){
         user.get().then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
+
                 setFirstName(userData.firstname);
                 setLastName(userData.lastname);
                 setEmail(userData.email);
                 setSex(userData.sex);
                 setBirthdate(userData.birthdate);
+                setPfpUrl(userData.pfp);
             } else {
                 console.log('No such document!');
             }
@@ -96,9 +101,21 @@ function UserForm(){
             email: email,
             birthdate: birthdate,
             sex: sex
-        }).then(() => {
-            setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
-            alertUser();
+        }).then(async() => {
+            const storage = getStorage();
+            const storageRef = ref(storage, 'images/' + pfp.name);
+            await uploadBytes(storageRef, pfp);
+            const downloadURL = await getDownloadURL(storageRef);
+
+            const oldImage = ref(storage, pfpUrl);
+            deleteObject(oldImage).then(() => {
+                setPfpUrl(downloadURL);
+            });
+
+            docRef.update({pfp: downloadURL}).then(() => {
+                setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
+                alertUser();
+            });
         }).catch((exception) => {
             console.log("Oh no! There was an error: ", exception);
             setAlert(<CustomAlert color={"danger"} message={"There was an error while updating your data, please try again later"} />);
@@ -120,6 +137,14 @@ function UserForm(){
         <>
             <Form>
                 <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
+                <Col md={6}>
+                    <img src={pfpUrl} style={{maxWidth: "25vw"}}/>
+                </Col>
+                <Col md={6}>
+                    <Label htmlFor={"fileChoser"}>Profile picture</Label>
+                    <Input type={"file"} name={"fileChoser"} onChange={(event) => {setPfp(event.target.files[0])}}/>
+                </Col>
+                <br/>
                 {
                     // First row: Firstname and Lastname
                 }
