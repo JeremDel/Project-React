@@ -8,7 +8,7 @@ import Home from "./screens/Home";
 import { Container } from "reactstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageHeader from "./layout/PageHeader";
-import MyData from "./screens/MyData";
+import Signup from "./screens/Signup";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
@@ -77,7 +77,7 @@ function App() {
                     <Route path="/" element={<Home uiConfig={uiConfig} />} />
                     <Route path="/login" element={<StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />} />
                     {error && <p style={{ color: "red" }}>{error}</p>}
-                    <Route path="/signup" element={<MyData />} />
+                    <Route path="/signup" element={<Signup />} />
                     <Route path="/*" element={<Navigate to="/" />} />
                 </Routes>
             </div>
@@ -92,7 +92,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/checkup" element={<Questionnaire />} />
-                    <Route path="/my-data" element={<MyData />} />
+                    <Route path="/signup" element={<Signup />} />
                 </Routes>
             </Container>
         </div>
