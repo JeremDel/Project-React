@@ -135,7 +135,7 @@ function UserForm(){
 
     return(
         <>
-            <Form>
+            <Form style={{marginTop: "10vh"}}>
                 <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
                 <Col md={6}>
                     <img src={pfpUrl} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
@@ -243,8 +243,6 @@ function TeamManagementForm(){
     const[alert, setAlert] = useState(<></>);
     const[alertVisible, setAlertVisible] = useState(false);
 
-    const[userAvailable, setUserAvailable] = useState(true);
-
     // Get the values of the group if the user is a leader
     useEffect(() => {
         const id = firebase.auth().currentUser.uid;
@@ -338,34 +336,27 @@ function TeamManagementForm(){
 
                 groupQuery.get().then((group) => {
                     if (!group.empty){
-                        setUserAvailable(false);
-                        console.log('Got im!');
+                        setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
+                        notifyUser();
+                        setEmail('');
                     } else {
-                        setUserAvailable(true);
+                        const updatedMembers = [...members, uid];
+                        setMembers(updatedMembers);
+
+                        const groupRef = firebase.firestore().collection('groups').doc(groupUid);
+                        groupRef.update({
+                            members: updatedMembers
+                        }).then(() => {
+                            setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
+                            notifyUser();
+                            setEmail('');
+                        }).catch((exception) => {
+                            console.log('Oh no! There was an error: ', exception);
+                        });
                     }
                 }).catch((exception) => {
                     console.log('Oh no! There was an error: ', exception);
                 });
-
-                if(userAvailable){
-                    const updatedMembers = [...members, uid];
-                    setMembers(updatedMembers);
-
-                    const groupRef = firebase.firestore().collection('groups').doc(groupUid);
-                    groupRef.update({
-                        members: updatedMembers
-                    }).then(() => {
-                        setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
-                        notifyUser();
-                        setEmail('');
-                    }).catch((exception) => {
-                        console.log('Oh no! There was an error: ', exception);
-                    });
-                } else {
-                    setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
-                    notifyUser();
-                    setEmail('');
-                }
             }
         });
     };
@@ -425,7 +416,7 @@ export default function MyFunction(){
     return(
         <>
             <UserForm/>
-            <Row>
+            <Row style={{marginBottom: "10vh"}}>
                 <Col md={6}>
                     <TeamManagementForm/>
                 </Col>
