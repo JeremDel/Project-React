@@ -142,7 +142,7 @@ function UserForm(){
                 </Col>
                 <Col md={6}>
                     <Label htmlFor={"fileChoser"}>Profile picture</Label>
-                    <Input type={"file"} name={"fileChoser"} onChange={(event) => {setPfp(event.target.files[0])}}/>
+                    <Input type={"file"} accept={"image/*"} name={"fileChoser"} onChange={(event) => {setPfp(event.target.files[0])}}/>
                 </Col>
                 <br/>
                 {
