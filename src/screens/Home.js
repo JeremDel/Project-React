@@ -1,39 +1,31 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Ajoutez cette ligne
+import { useNavigate } from 'react-router-dom';
 import firebaseApp from "../initFirebase";
-import { Button } from "reactstrap";
+import { Button, Container } from "reactstrap";
+
 import { StyledFirebaseAuth } from 'react-firebaseui';
-import './Home.css';
 
-
-// The Home component is responsible for rendering the homepage of the application and providing the option for users to log in or sign up.
 const Home = ({ uiConfig }) => {
-    // State hook to manage the visibility of the authentication UI
     const [showAuth, setShowAuth] = useState(false);
-    // Hook to navigate to different routes in the application
-    const navigate = useNavigate(); // Ajoutez cette ligne
+    const navigate = useNavigate();
 
-    // Handle the click event of the log in button
     const handleLoginClick = () => {
         setShowAuth(!showAuth);
     };
 
     return (
-        <div className="home-container">
-            <div className="home-image">
-                <img src="accueil_sport.jpeg" alt="sport" />
+        <Container className="d-flex flex-column justify-content-center align-items-center vh-100 bg-light">
+            <div className="d-flex justify-content-center mt-5">
+                <img src="accueil_sport.jpeg" alt="sport" className="img-fluid" />
             </div>
-            <div className="home-text">
-                <h1>Welcome to the Fitness Check !</h1>
-                <p>
-                    <h2>Please, <span onClick={handleLoginClick} style={{ cursor: 'pointer', textDecoration: 'underline' }}>log in</span> or{' '}
-                        <Button onClick={() => navigate('/signup')}>sign up for free</Button> in order to access the health checkup.
-                    </h2>
-                    {/* Render the authentication UI if showAuth is true */}
-                    {showAuth && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />}
-                </p>
+            <div className="text-center mt-5">
+                <h1 className="mb-4">Welcome to the Fitness Check !</h1>
+                <h2>Please, <span onClick={handleLoginClick} className="text-primary cursor-pointer text-underline">log in</span> or{' '}
+                    <Button onClick={() => navigate('/signup')} color="primary">sign up for free</Button> in order to access the health checkup.
+                </h2>
+                {showAuth && <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebaseApp.auth()} />}
             </div>
-        </div>
+        </Container>
     );
 };
 
