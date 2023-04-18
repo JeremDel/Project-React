@@ -12,6 +12,7 @@ import { Container } from "reactstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
+// import { useContext } from "react";
 
 
 // Configure FirebaseUI.
@@ -42,6 +43,8 @@ function App() {
     return () => unregisterAuthObserver();
   }, []);
 
+  // useContext()
+
   // Not initialized yet - Render loading message
   if (isSignedIn === null) {
     return (
@@ -69,7 +72,7 @@ function App() {
       <Container>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/checkup" element={<Questionnaire />} />
+          <Route path="/checkup/:active_theme" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
         </Routes>
       </Container>

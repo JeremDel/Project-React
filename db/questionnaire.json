@@ -9,123 +9,132 @@
           "label": "Do you engage in regular physical activity? ",
           "true/false": [
             {
-              "label": "Would you say you are active for at least 30 minutes each day (at least 5 days a week)?",
-              "true/false": [
-                {
-                  "label": "Do you sometimes/regularly get sweaty or out of breath during this activity?",
-                  "true/false": [
-                    {
-                      "label": "Yes",
-                      "points": 6,
-                      "recommendation": "It is very good, you are active at least 30 minutes a day 5 days a week. Keep it up!"
-                    },
-                    {
-                      "label": "No",
-                      "points": 5,
-                      "recommendation": {
-                        "text": "It sounds like the intensity you put into your sport is too low. The next time you train, try increasing it. Here are some links to help you.",
-                        "brochure": [
-                          {
-                            "link": "brochureIntensiteSport.com"
-                          },
-                          {
-                            "link": "brochureIntensiteSport.com"
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                },
-                {
-                  "label": "No",
-                  "points": 4,
-                  "recommendation": "It sounds like the intensity you put into your sport is too low. The next time you train, try to increase it."
-                }
-              ]
+				"label": "Yes",
+				"question" : {
+					"label": "Would you say you are active for at least 30 minutes each day (at least 5 days a week)?",
+					"true/false": [
+					  {
+						"label": "Do you sometimes/regularly get sweaty or out of breath during this activity?",
+						"true/false": [
+						  {
+							"label": "Yes",
+							"points": 6,
+							"recommendation": "It is very good, you are active at least 30 minutes a day 5 days a week. Keep it up!"
+						  },
+						  {
+							"label": "No",
+							"points": 5,
+							"recommendation": {
+							  "text": "It sounds like the intensity you put into your sport is too low. The next time you train, try increasing it. Here are some links to help you.",
+							  "brochure": [
+								{
+								  "link": "brochureIntensiteSport.com"
+								},
+								{
+								  "link": "brochureIntensiteSport.com"
+								}
+							  ]
+							}
+						  }
+						]
+					  },
+					  {
+						"label": "No",
+						"points": 4,
+						"recommendation": "It sounds like the intensity you put into your sport is too low. The next time you train, try to increase it."
+					  }
+					]
+				}
             },
             {
-              "label": "Would you like to resume more physical activity in the next few months?",
-              "true/false": [
-                {
-                  "label": "Yes",
-                  "points": 3,
-                  "recommendation": {
-                    "text": "Here are some useful links to help you get back into physical activity gently.",
-                    "brochure": [
-                      {
-                        "link": "brochureProSenectute.com"
-                      },
-                      {
-                        "link": "brochurePasdeRetraitePourMaSante.com"
-                      }
-                    ]
-                  }
-                },
-                {
-                  "questions": [
-                    {
-                      "label": "Do you know the health benefits of physical activity?",
-                      "true/false": [
-                        {
-                          "label": "Yes",
-                          "choice": 1
-                        },
-                        {
-                          "label": "No",
-                          "choice": 0
-                        }
-                      ]
-                    },
-                    {
-                      "label": "Do you know the risks of inactivity?",
-                      "true/false": [
-                        {
-                          "label": "Yes",
-                          "choice": 1
-                        },
-                        {
-                          "label": "No",
-                          "choice": 0
-                        }
-                      ]
-                    }
-                  ],
-                  "scoring": {
-                    "method": "any",
-                    "criteria": [
-                      {
-                        "question": 0,
-                        "choice": 1
-                      },
-                      {
-                        "question": 1,
-                        "choice": 1
-                      }
-                    ],
-                    "correct": {
-                      "points": 2,
-                      "recommendation": {
-                        "text": "We strongly encourage you to engage in regular activity. Here are some useful links to inform you about the benefits of physical activity.",
-                        "brochure": "brochuretropcool.com"
-                      }
-                    },
-                    "incorrect": {
-                      "points": 1,
-                      "recommendation": {
-                        "text": "We strongly encourage you to engage in regular activity. Here are some useful links to inform you about the benefits of physical activity.",
-                        "brochure": [
-                          {
-                            "link": "brochureEncourage.com"
-                          },
-                          {
-                            "link": "brochureBenefice.com"
-                          }
-                        ]
-                      }
-                    }
-                  }
-                }
-              ]
+				"label": "No",
+				"question":{
+
+					"label": "Would you like to resume more physical activity in the next few months?",
+					"true/false": [
+						{
+							"label": "Yes",
+							"points": 3,
+							"recommendation": {
+								"text": "Here are some useful links to help you get back into physical activity gently.",
+								"brochure": [
+									{
+										"link": "brochureProSenectute.com"
+									},
+									{
+										"link": "brochurePasdeRetraitePourMaSante.com"
+									}
+								]
+							}
+						},
+						{
+						"questions": [
+							{
+							"label": "Do you know the health benefits of physical activity?",
+							"true/false": [
+								{
+								"label": "Yes",
+								"choice": 1
+								},
+								{
+								"label": "No",
+								"choice": 0
+								}
+							]
+							},
+							{
+							"label": "Do you know the risks of inactivity?",
+							"true/false": [
+								{
+								"label": "Yes",
+								"choice": 1
+								},
+								{
+								"label": "No",
+								"choice": 0
+								}
+							]
+							}
+						],
+						"scoring": {
+							"method": "any",
+							"criteria": [
+								{
+									"question": 0,
+									"choice": 1
+								},
+								{
+									"question": 1,
+									"choice": 1
+								}
+							],
+							"correct": {
+							"points": 2,
+							"recommendation": {
+								"text": "We strongly encourage you to engage in regular activity. Here are some useful links to inform you about the benefits of physical activity.",
+								"brochure": "brochuretropcool.com"
+							}
+							},
+							"incorrect": {
+								"points": 1,
+								"recommendation": {
+									"text": "We strongly encourage you to engage in regular activity. Here are some useful links to inform you about the benefits of physical activity.",
+									"brochure": [
+									{
+										"link": "brochureEncourage.com"
+									},
+									{
+										"link": "brochureBenefice.com"
+									}
+									]
+								}
+							}
+						}
+						}
+					]					
+				}
+
+
             }
           ]
         }
