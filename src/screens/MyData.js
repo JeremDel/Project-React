@@ -138,7 +138,7 @@ function UserForm(){
             <Form>
                 <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
                 <Col md={6}>
-                    <img src={pfpUrl} style={{maxWidth: "25vw"}}/>
+                    <img src={pfpUrl} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
                 </Col>
                 <Col md={6}>
                     <Label htmlFor={"fileChoser"}>Profile picture</Label>
