@@ -25,14 +25,19 @@ function CustomAlert(props){
 }
 
 function UserForm(){
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [birthdate, setBirthdate] = useState("");
-    const [sex, setSex] = useState("");
+    const [userInfo, setUserInfo] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        birthdate: null,
+        isLeader: false,
+        photoURL: "",
+        sex: ""
+    });
+
     const [password, setPassword] = useState("");
     const [pfp, setPfp] = useState(null);
-    const [pfpUrl, setPfpUrl] = useState("");
+    const [imgChange, setImgChange] = useState(false);
 
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState(<></>);
@@ -47,13 +52,15 @@ function UserForm(){
         user.get().then((doc) => {
             if (doc.exists) {
                 const userData = doc.data();
-
-                setFirstName(userData.firstname);
-                setLastName(userData.lastname);
-                setEmail(userData.email);
-                setSex(userData.sex);
-                setBirthdate(userData.birthdate);
-                setPfpUrl(userData.pfp);
+                setUserInfo({
+                    firstName: userData.firstName,
+                    lastName: userData.lastName,
+                    email: userData.email,
+                    birthdate: userData.birthdate,
+                    isLeader: userData.isLeader,
+                    photoURL: userData.photoURL,
+                    sex: userData.sex
+                });
             } else {
                 console.log('No such document!');
             }
@@ -77,7 +84,7 @@ function UserForm(){
         );
 
         user.reauthenticateWithCredential(credential).then(() => {
-            user.updateEmail(email).then(() => {
+            user.updateEmail(userInfo.email).then(() => {
             }).catch((exception) => {
                 console.log(exception);
             });
@@ -87,7 +94,7 @@ function UserForm(){
 
         // Update display name
         auth.currentUser.updateProfile({
-            displayName: firstName + " " + lastName
+            displayName: userInfo.firstName + " " + userInfo.lastName
         }).then(() => {
 
         }).catch((exception) => {
@@ -96,26 +103,34 @@ function UserForm(){
 
         // Update users collection
         docRef.update({
-            firstname: firstName,
-            lastname: lastName,
-            email: email,
-            birthdate: birthdate,
-            sex: sex
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            email: userInfo.email,
+            birthdate: userInfo.birthdate,
+            sex: userInfo.sex
         }).then(async() => {
-            const storage = getStorage();
-            const storageRef = ref(storage, 'images/' + pfp.name);
-            await uploadBytes(storageRef, pfp);
-            const downloadURL = await getDownloadURL(storageRef);
+            if (imgChange){
+                const storage = getStorage();
+                const storageRef = ref(storage, 'images/' + pfp.name);
+                await uploadBytes(storageRef, pfp);
+                const downloadURL = await getDownloadURL(storageRef);
 
-            const oldImage = ref(storage, pfpUrl);
-            deleteObject(oldImage).then(() => {
-                setPfpUrl(downloadURL);
-            });
+                const oldImage = ref(storage, userInfo.photoURL);
+                deleteObject(oldImage).then(() => {
+                    setUserInfo({
+                        ...userInfo,
+                        photoURL: downloadURL
+                    });
+                });
 
-            docRef.update({pfp: downloadURL}).then(() => {
+                docRef.update({photoURL: downloadURL}).then(() => {
+                    setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
+                    alertUser();
+                });
+            } else {
                 setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
                 alertUser();
-            });
+            }
         }).catch((exception) => {
             console.log("Oh no! There was an error: ", exception);
             setAlert(<CustomAlert color={"danger"} message={"There was an error while updating your data, please try again later"} />);
@@ -133,16 +148,28 @@ function UserForm(){
         }, 2500);
     };
 
+    const handleChange = (event) => {
+        setUserInfo({
+            ...userInfo,
+            [event.target.name]: event.target.value
+        })
+    };
+
+    const handleImgUpload = (event) => {
+        setImgChange(true);
+        setPfp(event.target.files[0]);
+    };
+
     return(
         <>
             <Form style={{marginTop: "10vh"}}>
                 <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
                 <Col md={6}>
-                    <img src={pfpUrl} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
+                    <img src={userInfo.photoURL} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
                 </Col>
                 <Col md={6}>
                     <Label htmlFor={"fileChoser"}>Profile picture</Label>
-                    <Input type={"file"} accept={"image/*"} name={"fileChoser"} onChange={(event) => {setPfp(event.target.files[0])}}/>
+                    <Input type={"file"} accept={"image/*"} name={"fileChoser"} onChange={handleImgUpload}/>
                 </Col>
                 <br/>
                 {
@@ -151,14 +178,14 @@ function UserForm(){
                 <Row>
                     <Col md={6}>
                         <FormGroup>
-                            <Label htmlFor={"firstname"}>Firstname</Label>
-                            <Input type="text" name="firstname" placeholder={"Firstname"} value={firstName} onChange={(event) => setFirstName(event.target.value)}/>
+                            <Label htmlFor={"firstName"}>Firstname</Label>
+                            <Input type="text" name="firstName" placeholder={"Firstname"} value={userInfo.firstName} onChange={handleChange}/>
                         </FormGroup>
                     </Col>
                     <Col md={6}>
                         <FormGroup>
-                            <Label htmlFor={"lastname"}>Lastname</Label>
-                            <Input type="text" name="lastname" placeholder={"Lastname"}  value={lastName} onChange={(event) => setLastName(event.target.value)}/>
+                            <Label htmlFor={"lastName"}>Lastname</Label>
+                            <Input type="text" name="lastName" placeholder={"Lastname"}  value={userInfo.lastName} onChange={handleChange}/>
                         </FormGroup>
                     </Col>
                 </Row>
@@ -168,7 +195,7 @@ function UserForm(){
                 }
                 <FormGroup>
                     <Label htmlFor={"email"}>Email</Label>
-                    <Input type="email" name="email" placeholder={"Email"} value={email} onChange={(event) => setEmail(event.target.value)}/>
+                    <Input type="email" name="email" placeholder={"Email"} value={userInfo.email} onChange={handleChange}/>
                 </FormGroup>
 
                 {
@@ -178,7 +205,7 @@ function UserForm(){
                     <Col md={6}>
                         <FormGroup>
                             <Label htmlFor={"birthdate"}>Birthdate</Label>
-                            <Input type="date" name="birthdate" placeholder={"Birthdate"} value={birthdate} onChange={(event) => setBirthdate(event.target.value)}/>
+                            <Input type="date" name="birthdate" placeholder={"Birthdate"} value={userInfo.birthdate} onChange={handleChange}/>
                         </FormGroup>
                     </Col>
                     <Col md={6}>
@@ -188,14 +215,14 @@ function UserForm(){
                         <Row style={{marginTop: "1.5vh"}}>
                             <Col md={4}>
                                 <FormGroup check>
-                                    <Input name={"sex"} type={"radio"} value={"woman"} checked={sex === "woman"} onChange={(event) => setSex(event.target.value)}/>
-                                    <Label>Woman</Label>
+                                    <Input name={"sex"} type={"radio"} value={"female"} checked={userInfo.sex === "female"} onChange={handleChange}/>
+                                    <Label>Female</Label>
                                 </FormGroup>
                             </Col>
                             <Col md={4}>
                                 <FormGroup check>
-                                    <Input name={"sex"} type={"radio"} value={"man"} checked={sex === "man"} onChange={(event) => setSex(event.target.value)}/>
-                                    <Label>Man</Label>
+                                    <Input name={"sex"} type={"radio"} value={"male"} checked={userInfo.sex === "male"} onChange={handleChange}/>
+                                    <Label>Male</Label>
                                 </FormGroup>
                             </Col>
                         </Row>
