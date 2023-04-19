@@ -257,18 +257,25 @@ function UserForm(){
 }
 
 function TeamManagementForm(){
+    // Current user's data
     const [isLeader, setLeader] = useState(false);
+
+    // Current user's group data
     const [groupUid, setGroupUid] = useState('');
     const [groupName, setGroupName] = useState('');
     const [members, setMembers] = useState([]);
-
     const [membersNames, setMembersNames] = useState([]);
+
+    // Display variable
     const[content, setContent] = useState([]);
 
+    // User-to-add data
     const [email, setEmail] = useState('');
 
+    // Alert
     const[alert, setAlert] = useState(<></>);
     const[alertVisible, setAlertVisible] = useState(false);
+
 
     // Get the values of the group if the user is a leader
     useEffect(() => {
@@ -299,7 +306,7 @@ function TeamManagementForm(){
             const memberRef = firebase.firestore().collection('users').doc(member);
             return memberRef.get().then((member) => {
                 const memberData = member.data();
-                return memberData.firstname;
+                return memberData.firstName;
             }).catch((error) => {
                 console.log('Oh no! There was an error: ', error);
             });
@@ -365,7 +372,6 @@ function TeamManagementForm(){
                     if (!group.empty){
                         setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
                         notifyUser();
-                        setEmail('');
                     } else {
                         const updatedMembers = [...members, uid];
                         setMembers(updatedMembers);
@@ -376,11 +382,11 @@ function TeamManagementForm(){
                         }).then(() => {
                             setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
                             notifyUser();
-                            setEmail('');
                         }).catch((exception) => {
                             console.log('Oh no! There was an error: ', exception);
                         });
                     }
+                    setEmail('');
                 }).catch((exception) => {
                     console.log('Oh no! There was an error: ', exception);
                 });
