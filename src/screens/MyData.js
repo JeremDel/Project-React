@@ -127,6 +127,8 @@ function UserForm(){
                     setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
                     alertUser();
                 });
+
+                setImgChange(false);
             } else {
                 setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
                 alertUser();
