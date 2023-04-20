@@ -8,7 +8,6 @@ import questionnaire from "../data/questionnaire";
 
 import QuestionnaireNavBar from "./QuestionnaireNavBar";
 import QuestionnaireTheme from "./QuestionnaireTheme";
-import QuestionnaireQuestion from "./QuestionnaireQuestion";
 export default function Questionnaire() {
   
   const { active_theme } = useParams();
@@ -16,17 +15,14 @@ export default function Questionnaire() {
 
   return (
     <div>
+      <h1>Checkup</h1>
 
       <QuestionnaireNavBar themes={ questionnaire.themes } activeTheme={ active_theme } />
 
-      <QuestionnaireTheme theme={ questionnaire.themes[themeIndex] }></QuestionnaireTheme>
-
-
-      
-        
+      <QuestionnaireTheme theme={ questionnaire.themes[themeIndex] } key={ "active_theme-" + active_theme }></QuestionnaireTheme>
 
       <hr/>
-        <Link to="https://stackoverflow.com/questions/27864951/how-to-access-a-childs-state-in-react/27875018#27875018">Some ide</Link>
+        <Link to="https://stackoverflow.com/questions/27864951/how-to-access-a-childs-state-in-react/27875018#27875018">Some ideas</Link>
       
     </div>
   );

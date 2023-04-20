@@ -596,7 +596,8 @@ const questionnaire = {
             },
             {
               "label": "No pain",
-              "points": 0
+              "points": 0,
+              "exclusive": true
             }
           ]
         }
@@ -624,7 +625,8 @@ const questionnaire = {
             },
             {
               "label": "No, no mobility problems",
-              "points": 0
+              "points": 0,
+              "exclusive": true
             }
           ]
         }

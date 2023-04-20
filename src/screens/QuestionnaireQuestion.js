@@ -1,7 +1,95 @@
 // import { Link } from "react-router-dom";
 import React from 'react';
+import {
+    Button,
+    Col,
+    Form,
+    FormGroup,
+    Input,
+    Label,
+    ListGroup,
+    ListGroupItem,
+    Row,
+    UncontrolledAlert
+} from 'reactstrap'
 
 export default class QuestionnaireQuestion extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+          answers: [],
+          disabledCheckbox: []
+        };
+        this.toggleRadio = this.toggleRadio.bind(this);
+        this.toggleCheckbox = this.toggleCheckbox.bind(this);
+
+       /*  this.answers = this.props.question.answers.map((a, i) => {
+            return {
+                answer: a,
+                index: i
+            };
+        }) */
+
+        this.exclusiveAnswers = [];
+        this.nonExclusiveAnswers = [];
+
+        this.props.question.answers.forEach((element, index) => {
+            if (element.exclusive) {
+                this.exclusiveAnswers.push(index);
+            }
+            else {
+                this.nonExclusiveAnswers.push(index);
+            }
+        });
+
+        // this.exclusiveAnswers = this.answers.filter(el => el.a.exclusive ? true: false).map(el => el.index)
+      }
+    
+      toggleRadio(event) {
+        this.setState({ answers: [ event.target.value ]}, this.triggerNewState);
+      }
+
+      triggerNewState() {
+        this.props.onStateChange(this.props.questionId, this.state)
+      }
+
+      toggleCheckbox(event) {
+        let t = event.target;
+        console.log(t.name, t.value);
+        
+        
+        this.setState(state => { 
+            let newState = {
+                answers : [],
+                disabledCheckbox : state.disabledCheckbox
+            }
+
+            if (t.checked) {
+                newState.answers = [...state.answers, t.value].sort();
+
+                if (this.props.question.answers[t.value].exclusive) {
+                    // Disable other checkboxes
+                    newState.disabledCheckbox = this.nonExclusiveAnswers;
+                }
+                else {
+                    newState.disabledCheckbox = this.exclusiveAnswers;
+                }
+            } 
+            else {
+                newState.answers = state.answers.filter(v => v !== t.value).sort()
+
+                if (newState.answers.length === 0) {
+                    // remove disabling checkboxes
+                    newState.disabledCheckbox = []
+                }
+            }
+            
+            //this.triggerNewState(newState)
+
+            return newState
+        }, this.triggerNewState)
+    }
 
     formControl(questionId, answerId) {
 
@@ -9,17 +97,23 @@ export default class QuestionnaireQuestion extends React.Component {
         if (this.props.type === 'Single') {
             return <input 
                     type="radio" 
-                    name={ "answer[" + questionId + "]" } 
-                    value={answerId} 
-                    onChange={ e => this.toggleRadio(e.target) } />
+                    name={ questionId } 
+                    value={ answerId } 
+                    onChange={ this.toggleRadio }
+                     />
         }
 
         if (this.props.type === 'Multiple') {
+            console.log(this.state.disabledCheckbox)
+            console.log(this.state.disabledCheckbox.indexOf(answerId))
+            console.log(this.state.disabledCheckbox.indexOf(answerId) > -1)
             return <input 
                     type="checkbox" 
-                    name={ "answer[" + questionId + "][]"} 
+                    name={ questionId + "[" + answerId + "]"} 
                     value={ answerId } 
-                    onChange={ e => this.toggleCheckbox(e.target) } />
+                    onChange={ this.toggleCheckbox }
+                    disabled={ this.state.disabledCheckbox.indexOf(answerId) > -1 }
+                     />
         }
 
     }
@@ -28,23 +122,31 @@ export default class QuestionnaireQuestion extends React.Component {
         
         return (
             <div>
-                <p><b>{this.props.question.label}</b></p>
-                <ul class="answersList">
-                    {
-                        this.props.question.answers.map((answer, index) => {
-                            return (
-                                <li>
-                                    <label>
-                                        { this.formControl(this.props.questionId, index) }
-                                        &nbsp;
-                                        { answer.label }
-                                    </label>
-                                </li>
-                            )
-                        })
-                    }                
-                </ul>
+                <Row>
+                    <Col md={9}>
+                                
+                        <p><b>{this.props.question.label}</b></p>
+                        <ul className="answersList">
+                            {
+                                this.props.question.answers.map((answer, index) => {
+                                    return (
+                                        <li key={ 'a-' + index }>
+                                            <label>
+                                                { this.formControl(this.props.questionId, index) }
+                                                &nbsp;
+                                                { answer.label }
+                                            </label>
+                                        </li>
+                                    )
+                                })
+                            }                
+                        </ul>
 
+                    </Col>
+                    <Col md={3}>
+                        <pre>{ JSON.stringify(this.state, null, 4) }</pre>
+                    </Col>
+                </Row>
             </div>
         );
     } 
