@@ -41,6 +41,9 @@ function UserForm(){
 
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState(<></>);
+    const [imageSrc, setImageSrc] = useState('');
+
+    const defaultProfilePicture = "defaultPfp.png";
 
     useEffect(() => {
 
@@ -61,6 +64,20 @@ function UserForm(){
                     photoURL: userData.photoURL,
                     sex: userData.sex
                 });
+
+                if(userData.photoURL && typeof userData.photoURL === 'string' && userData.photoURL.trim() !== ''){
+                    setImageSrc(userData.photoURL);
+                } else {
+                    try {
+                        const path = 'assets/' + defaultProfilePicture;
+                        const storageRef = ref(getStorage(), path);
+                        getDownloadURL(storageRef).then((url) => {
+                            setImageSrc(url);
+                        });
+                    } catch (error) {
+                        console.log('Error getting default image URL', error);
+                    }
+                }
             } else {
                 console.log('No such document!');
             }
@@ -115,19 +132,23 @@ function UserForm(){
                 await uploadBytes(storageRef, pfp);
                 const downloadURL = await getDownloadURL(storageRef);
 
-                const oldImage = ref(storage, userInfo.photoURL);
-                deleteObject(oldImage).then(() => {
-                    setUserInfo({
-                        ...userInfo,
-                        photoURL: downloadURL
-                    });
+                console.log(userInfo.photoURL);
+                if(userInfo.photoURL && typeof userInfo.photoURL === 'string' && userInfo.photoURL.trim() !== ''){
+                    const oldImage = ref(storage, userInfo.photoURL);
+                    deleteObject(oldImage);
+                }
+                setUserInfo({
+                    ...userInfo,
+                    photoURL: downloadURL
                 });
+
 
                 docRef.update({photoURL: downloadURL}).then(() => {
                     setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
                     alertUser();
                 });
 
+                setImageSrc(downloadURL);
                 setImgChange(false);
             } else {
                 setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
@@ -167,7 +188,7 @@ function UserForm(){
             <Form style={{marginTop: "10vh"}}>
                 <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
                 <Col md={6}>
-                    <img src={userInfo.photoURL} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
+                    <img src={imageSrc} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
                 </Col>
                 <Col md={6}>
                     <Label htmlFor={"fileChoser"}>Profile picture</Label>
