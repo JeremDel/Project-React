@@ -47,16 +47,17 @@ export default class QuestionnaireQuestion extends React.Component {
       }
     
       toggleRadio(event) {
-        this.setState({ answers: [ event.target.value ]}, this.triggerNewState);
+        this.setState({ answers: [ parseInt(event.target.value) ]}, this.triggerNewState);
       }
 
       triggerNewState() {
-        this.props.onStateChange(this.props.questionId, this.state)
+        this.props.onStateChange(this.props.questionId, this.state.answers)
       }
 
       toggleCheckbox(event) {
         let t = event.target;
         console.log(t.name, t.value);
+        let value = parseInt(t.value);
         
         
         this.setState(state => { 
@@ -66,9 +67,9 @@ export default class QuestionnaireQuestion extends React.Component {
             }
 
             if (t.checked) {
-                newState.answers = [...state.answers, t.value].sort();
+                newState.answers = [...state.answers, value].sort();
 
-                if (this.props.question.answers[t.value].exclusive) {
+                if (this.props.question.answers[value].exclusive) {
                     // Disable other checkboxes
                     newState.disabledCheckbox = this.nonExclusiveAnswers;
                 }
@@ -77,7 +78,7 @@ export default class QuestionnaireQuestion extends React.Component {
                 }
             } 
             else {
-                newState.answers = state.answers.filter(v => v !== t.value).sort()
+                newState.answers = state.answers.filter(v => v !== value).sort()
 
                 if (newState.answers.length === 0) {
                     // remove disabling checkboxes
@@ -104,9 +105,8 @@ export default class QuestionnaireQuestion extends React.Component {
         }
 
         if (this.props.type === 'Multiple') {
-            console.log(this.state.disabledCheckbox)
-            console.log(this.state.disabledCheckbox.indexOf(answerId))
-            console.log(this.state.disabledCheckbox.indexOf(answerId) > -1)
+            console.log(typeof answerId);
+
             return <input 
                     type="checkbox" 
                     name={ questionId + "[" + answerId + "]"} 

@@ -1,5 +1,7 @@
 // import { Link } from "react-router-dom";
 import React from 'react';
+import { produce } from "immer"
+
 import QuestionnaireQuestion from './QuestionnaireQuestion';
 import { Col, Row } from 'reactstrap';
 export default class QuestionnaireTheme extends React.Component {
@@ -18,20 +20,29 @@ export default class QuestionnaireTheme extends React.Component {
         }
     }
 
-    onQuestionStateChange(questionId, state) {
+    /* onThemeChange() {
+        this.props.onThemeChange(this.state);
+    } */
+
+    onQuestionStateChange(questionId, qState) {
 
         this.setState(state => {
-            let questions = state.questions
-        })
-        let newState = { answers: {}};
-        newState.answers[questionId] = state.answers;
 
-        if (this.props.theme === 'Flow') {
-            this.setState (newState)
-        }
-        else {
-           this.setState (newState)
-        }
+            const nextState = produce(state, draftState => {
+                draftState.questions[questionId] = qState;
+
+                // if ()
+                // Set a valid state when Flow type will be defined
+            })
+
+            return { questions: nextState }
+        }, () => { 
+            this.props.onThemeChange(this.props.themeId, this.state) 
+        })
+    }
+
+    onFlowQuestionChange() {
+
     }
 
     questions() {
