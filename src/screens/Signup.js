@@ -23,6 +23,7 @@ const Signup = () => {
     });
 
     const [errorMessage, setErrorMessage] = useState(null);
+    const [feedback, setFeedback] = useState('');
 
     const navigate = useNavigate();
 
@@ -30,6 +31,14 @@ const Signup = () => {
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
         setFormValues({ ...formValues, [name]: type === 'checkbox' ? checked : value });
+
+        if (event.target.name === 'password'){
+            if(value.length < 6){
+                setFeedback('Password must be at least 6 characters long');
+            } else {
+                setFeedback('');
+            }
+        }
     };
 
     // Update profile picture
@@ -168,6 +177,11 @@ const Signup = () => {
                 <FormGroup>
                     <Label for="password">Password</Label>
                     <Input type="password" name="password" id="password" value={formValues.password} onChange={handleInputChange} required />
+                    {feedback &&
+                        (
+                            <Label style={{color: "red"}}>Password must be at least 6 characters long.</Label>
+                        )
+                    }
                 </FormGroup>
                 <FormGroup>
                     <Label for="confirmPassword">Confirm Password</Label>
