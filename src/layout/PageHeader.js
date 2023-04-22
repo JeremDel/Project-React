@@ -47,6 +47,11 @@ export default function PageHeader() {
                                 Logout
                             </NavLink>
                         </NavItem>
+                        <NavItem>
+                            <NavLink href="/admin">
+                                Admin
+                            </NavLink>
+                        </NavItem>
                     </Nav>
                     <NavbarText>Simple Text</NavbarText>
                 </Collapse>
