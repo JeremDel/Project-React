@@ -198,7 +198,7 @@ const Signup = () => {
                     <Input type="file" name="profileImage" id="profileImage" onChange={handleFileInputChange} />
                 </FormGroup>
                 <center>
-                    <Button color="primary" type="submit" onClick={handleSubmit}>Sign up</Button>
+                    <Button color="primary" type="submit" onClick={handleSubmit} disabled={feedback ? true : false}>Sign up</Button>
                 </center>
             </Form>
         </>
