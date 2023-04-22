@@ -72,7 +72,6 @@ function App() {
           <Route path="/checkup/:active_theme" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
           <Route path="/admin" element={<Admin />} />
-
         </Routes>
       </Container>
     </div>

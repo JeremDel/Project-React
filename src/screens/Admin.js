@@ -3,34 +3,32 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import questionnaire from '../data/questionnaire.js';
+import {Nav, NavItem, NavLink} from "reactstrap";
+import {produce} from 'immer';
 
-/** Firebase : Collection = questionnaires / document = 1PAYZF2hVLLz9GUyQQYA FUNCTIONAL COMPONENT*/
+/** Firebase : Collection = questionnaires / document = 1PAYZF2hVLLz9GUyQQYA*/
 
 class Admin extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            json: JSON.stringify(questionnaire),
+            questionnaire: questionnaire,
             errorMessage: null,
             successMessage: null,
             showSuccessMessage: false,
+            active_theme: 0
         };
-        this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        this.setState({ json: event.target.value });
-    }
 
     handleSubmit(event) {
         event.preventDefault();
         const db = firebase.firestore();
         try {
-            const data = JSON.parse(this.state.json);
             db.collection('questionnaires')
                 .doc('default')
-                .set(data)
+                .set(this.state.questionnaire)
                 .then(() => {
                     this.setState({
                         successMessage: 'Questionnaire successfully saved!',
@@ -50,65 +48,90 @@ class Admin extends React.Component {
     }
 
         render() {
-            const { json } = this.state;
-            const data = JSON.parse(json);
             return (
                 <div>
-                    <h2>Questionnaire Editor</h2>
+                    <h2>Admin edition page</h2>
+
+                    <Nav tabs>
+
+                        {
+                            this.state.questionnaire.themes.map((theme, index) => (
+                                <NavItem key={ 'theme-' + index}>
+                                    <NavLink
+                                        className={this.state.active_theme === index ? "active" : ""}
+                                        onClick={() => {
+                                            this.setState({active_theme: index});
+                                        }}
+                                        role="button"
+                                    >
+                                        {theme.name}
+                                    </NavLink>
+                                </NavItem>
+                            ))
+                        }
+                    </Nav>
+
                     {this.state.errorMessage && (
                         <p className="text-danger">{this.state.errorMessage}</p>
                     )}
                     <form onSubmit={this.handleSubmit}>
-                        {data.themes.map((theme, themeIndex) => (
-                            <div key={themeIndex} className="mb-4">
-                                <h4>{theme.name}</h4>
-                                {theme.questions.map((question, questionIndex) => (
-                                    <div key={questionIndex} className="form-group">
-                                        <label htmlFor={`question-${themeIndex}-${questionIndex}`}>
-                                            Question
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id={`question-${themeIndex}-${questionIndex}`}
-                                            value={question.label}
-                                            onChange={(event) => {
-                                                const value = event.target.value;
-                                                const themes = [...data.themes];
-                                                const questions = [...themes[themeIndex].questions];
-                                                questions[questionIndex] = { ...question, label: value };
-                                                themes[themeIndex] = { ...theme, questions };
-                                                const updatedJson = JSON.stringify({ ...data, themes });
-                                                this.setState({ json: updatedJson });
-                                            }}
-                                        />
-                                        <label>Answers:</label>
-                                        {question.answers.map((answer, answerIndex) => (
-                                            <div key={answerIndex} className="form-group">
+                        {
+                            this.state.questionnaire.themes.map((theme, themeIndex) => {
+
+                                return themeIndex !== this.state.active_theme ? <></> : (
+                                    <div key={themeIndex} className="mb-4">
+                                        <h4>{theme.name}</h4>
+                                        {theme.questions.map((question, questionIndex) => (
+                                            <div key={questionIndex} className="form-group">
+                                                <label htmlFor={`question-${themeIndex}-${questionIndex}`} className="mb-2">
+                                                    Question :
+                                                </label>
                                                 <input
                                                     type="text"
-                                                    className="form-control"
-                                                    id={`answer-${themeIndex}-${questionIndex}-${answerIndex}`}
-                                                    value={answer.label}
+                                                    className="form-control mb-3"
+                                                    id={`question-${themeIndex}-${questionIndex}`}
+                                                    value={question.label}
                                                     onChange={(event) => {
-                                                        const value = event.target.value;
-                                                        const themes = [...data.themes];
-                                                        const questions = [...themes[themeIndex].questions];
-                                                        const answers = [...questions[questionIndex].answers];
-                                                        answers[answerIndex] = { ...answer, label: value };
-                                                        questions[questionIndex] = { ...question, answers };
-                                                        themes[themeIndex] = { ...theme, questions };
-                                                        const updatedJson = JSON.stringify({ ...data, themes });
-                                                        this.setState({ json: updatedJson });
+                                                        this.setState(state => {
+                                                            const nextState = produce(state.questionnaire, draftState => {
+                                                                draftState.themes[themeIndex].questions[questionIndex].label = event.target.value;
+                                                            });
+                                                            return { questionnaire: nextState };
+                                                        });
                                                     }}
                                                 />
+                                                <div className="mb-2">
+                                                    <label>Answers :</label>
+                                                </div>
+                                                {question.answers.map((answer, answerIndex) => (
+                                                    <div key={answerIndex} className="form-group">
+                                                        <input
+                                                            type="text"
+                                                            className="form-control mb-3"
+                                                            id={`answer-${themeIndex}-${questionIndex}-${answerIndex}`}
+                                                            value={answer.label}
+                                                            onChange={(event) => {
+                                                                this.setState(state => {
+                                                                    const nextState = produce(state.questionnaire, draftState => {
+                                                                        draftState
+                                                                            .themes[themeIndex]
+                                                                            .questions[questionIndex]
+                                                                            .answers[answerIndex]
+                                                                            .label = event.target.value;
+                                                                    });
+                                                                    return { questionnaire: nextState };
+                                                                });
+                                                            }}
+                                                        />
+                                                    </div>
+                                                ))}
                                             </div>
                                         ))}
                                     </div>
-                                ))}
-                            </div>
-                        ))}
-                        <div className="fixed-bottom">
+                                )
+                            })
+                        }
+                        <div className="d-flex justify-content-end">
                             <button type="submit" className="btn btn-primary">
                                 Save
                             </button>
@@ -126,9 +149,6 @@ class Admin extends React.Component {
                 </div>
             );
         }
-
-
-
 }
 
 export default Admin;
