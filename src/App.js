@@ -3,9 +3,10 @@ import firebase from "firebase/compat/app";
 import firebaseApp from "./initFirebase";
 import { StyledFirebaseAuth } from "react-firebaseui";
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import {Routes, Route, Navigate} from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
+import Signup from "./screens/Signup";
 import { Container } from "reactstrap";
 
 
@@ -59,6 +60,11 @@ function App() {
           uiConfig={uiConfig}
           firebaseAuth={firebaseApp.auth()}
         />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/*" element={<Navigate to="/"/>}/>
+        </Routes>
       </div>
     );
 
