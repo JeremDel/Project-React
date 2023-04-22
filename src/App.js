@@ -15,18 +15,6 @@ import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
 import Admin from "./screens/Admin";
 
-// Configure FirebaseUI.
-const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: "popup",
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-  callbacks: {
-    // Avoid redirects after sign-in.
-    signInSuccessWithAuthResult: () => false,
-  },
-};
-
 function App() {
   // Local signed-in state.
   const [isSignedIn, setIsSignedIn] = useState(null);
@@ -56,15 +44,13 @@ function App() {
   if (!isSignedIn)
     return (
       <div className="App">
-        <StyledFirebaseAuth
-          uiConfig={uiConfig}
-          firebaseAuth={firebaseApp.auth()}
-        />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/*" element={<Navigate to="/"/>}/>
-        </Routes>
+          <Container>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/*" element={<Navigate to="/"/>}/>
+            </Routes>
+         </Container>
       </div>
     );
 
