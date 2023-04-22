@@ -24,16 +24,6 @@ const Home = () => {
         setError(null);
     };
 
-    //TODO remove
-    const handleEmailChange = (event) => {
-        setEmail(event.target.value);
-    };
-
-    //TODO remove
-    const handlePasswordChange = (event) => {
-        setPassword(event.target.value);
-    };
-
     // Try to sign in the user after submitting their email and password
     const handleSignIn = (event) => {
         event.preventDefault();
@@ -79,11 +69,11 @@ const Home = () => {
                                 <Form>
                                     <FormGroup>
                                         <Label for="email">Email</Label>
-                                        <Input type="email" name="email" id="email" value={email} onChange={handleEmailChange} required />
+                                        <Input type="email" name="email" id="email" value={email} onChange={(event) => {setEmail(event.target.value)}} required />
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="password">Password</Label>
-                                        <Input type="password" name="password" id="password" value={password} onChange={handlePasswordChange} required />
+                                        <Input type="password" name="password" id="password" value={password} onChange={(event) => {setPassword(event.target.value)}} required />
                                     </FormGroup>
                                 </Form>
                             </ModalBody>
