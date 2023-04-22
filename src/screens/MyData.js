@@ -261,15 +261,18 @@ function UserForm(){
 function TeamManagementForm(){
     // Current user's data
     const [isLeader, setLeader] = useState(false);
+    const [isMember, setMember] = useState(false);
 
     // Current user's group data
     const [groupUid, setGroupUid] = useState('');
     const [groupName, setGroupName] = useState('');
     const [members, setMembers] = useState([]);
     const [membersNames, setMembersNames] = useState([]);
+    const [leaderName, setLeaderName] = useState('');
 
     // Display variable
     const[content, setContent] = useState([]);
+    const [label, setLabel] = useState(<></>);
 
     // User-to-add data
     const [email, setEmail] = useState('');
@@ -296,6 +299,35 @@ function TeamManagementForm(){
                 const data = group.docs[0].data();
                 setGroupName(data.name);
                 setMembers(data.members);
+
+                setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {groupName}</h3>);
+            } else {
+                // User is not a leader, but maybe he's a member
+                const query = groups.where('members', "array-contains", id);
+                query.get().then((group) => {
+                    if(!group.empty){
+                        // User belongs to a group
+                        setMember(true);
+                        setGroupUid(group.docs[0].id);
+
+                        const data = group.docs[0].data();
+                        setGroupName(data.name);
+                        setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Member of the team: {data.name}</h3>);
+
+                        // Store leader's name
+                        const leaderDoc = firebase.firestore().collection('users').doc(data.leader);
+                        leaderDoc.get().then((doc) => {
+                            if(doc.exists){
+                                const leaderData = doc.data();
+                                setLeaderName(leaderData.firstName + ' ' + leaderData.lastName);
+                            }
+                        }).catch((error) => {
+                            console.log('Oh no! There was an error: ', error);
+                        });
+                    }
+                }).catch((error) => {
+                    console.log('Oh no! There was an error: ', error);
+                });
             }
         }).catch((error) => {
             console.log('Oh no! There was an error: ', error);
@@ -303,41 +335,43 @@ function TeamManagementForm(){
     }, []);
 
     useEffect(() => {
-        // For each member in the members list, get their name and add it to the membersnames list
-        const memberNamePromises = members.map((member) => {
-            const memberRef = firebase.firestore().collection('users').doc(member);
-            return memberRef.get().then((member) => {
-                const memberData = member.data();
-                return memberData.firstName;
+        if (isLeader){
+            // For each member in the members list, get their name and add it to the membersnames list
+            const memberNamePromises = members.map((member) => {
+                const memberRef = firebase.firestore().collection('users').doc(member);
+                return memberRef.get().then((member) => {
+                    const memberData = member.data();
+                    return memberData.firstName;
+                }).catch((error) => {
+                    console.log('Oh no! There was an error: ', error);
+                });
+            });
+
+            Promise.all(memberNamePromises).then((memberNames) => {
+                // Once all member names have been retrieved, update the state variables
+                setMembersNames(memberNames);
+
+                const contentItems = memberNames.map((name, index) => (
+                    <>
+                        <Row>
+                            <Col md={9}>
+                                <ListGroupItem key={index}>
+                                    {name}
+                                </ListGroupItem>
+                            </Col>
+                            <Col md={3}>
+                                <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
+                                    Remove
+                                </Button>
+                            </Col>
+                        </Row>
+                    </>
+                ));
+                setContent(contentItems);
             }).catch((error) => {
                 console.log('Oh no! There was an error: ', error);
             });
-        });
-
-        Promise.all(memberNamePromises).then((memberNames) => {
-            // Once all member names have been retrieved, update the state variables
-            setMembersNames(memberNames);
-
-            const contentItems = memberNames.map((name, index) => (
-                <>
-                    <Row>
-                        <Col md={9}>
-                            <ListGroupItem key={index}>
-                                {name}
-                            </ListGroupItem>
-                        </Col>
-                        <Col md={3}>
-                            <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
-                                Remove
-                            </Button>
-                        </Col>
-                    </Row>
-                </>
-            ));
-            setContent(contentItems);
-        }).catch((error) => {
-            console.log('Oh no! There was an error: ', error);
-        });
+        }
     }, [members]);
 
     const deleteMember = (index) => {
@@ -408,40 +442,55 @@ function TeamManagementForm(){
     return(
         <>
             {
-                isLeader &&
+                (isLeader || isMember) &&
                 (
-                    <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {groupName}</h3>
+                    label
                 )
             }
-            <ListGroup>
-                {
-                    isLeader &&
-                    (
-                        content
-                    )
-                }
-            </ListGroup>
-                {
-                    isLeader &&
-                    (
-                        <>
-                            <Row style={{marginTop: '2vh'}}>
-                                <Col md={9}>
-                                    <Input type={"email"} placeholder={"New member's email address"} value={email} onChange={(event) => {setEmail(event.target.value)}}/>
-                                </Col>
-                                <Col md={3}>
-                                    <Button color={"success"} style={{width: '100%'}} onClick={() => {addMember(email)}}>Add member</Button>
-                                </Col>
-                            </Row>
-                        </>
-                    )
-                }
-                {
-                    alertVisible &&
-                    (
-                        alert
-                    )
-                }
+            {
+                isLeader &&
+                (
+                    <>
+                        <ListGroup>
+                            {
+                                isLeader &&
+                                (
+                                    content
+                                )
+                            }
+                        </ListGroup>
+                        <Row style={{marginTop: '2vh'}}>
+                            <Col md={9}>
+                                <Input type={"email"} placeholder={"New member's email address"} value={email} onChange={(event) => {setEmail(event.target.value)}}/>
+                            </Col>
+                            <Col md={3}>
+                                <Button color={"success"} style={{width: '100%'}} onClick={() => {addMember(email)}}>Add member</Button>
+                            </Col>
+                        </Row>
+                    </>
+                )
+            }
+            {
+                isMember &&
+                (
+                    <Row>
+                        <Col md={3}>
+                            <Label>Team manager: </Label>
+                        </Col>
+                        <Col>
+                            <Label>
+                                {leaderName}
+                            </Label>
+                        </Col>
+                    </Row>
+                )
+            }
+            {
+                alertVisible &&
+                (
+                    alert
+                )
+            }
         </>
     );
 }
