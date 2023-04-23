@@ -3,28 +3,17 @@ import firebase from "firebase/compat/app";
 import firebaseApp from "./initFirebase";
 import { StyledFirebaseAuth } from "react-firebaseui";
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import {Routes, Route, Navigate} from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
+import Signup from "./screens/Signup";
 import { Container } from "reactstrap";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
-
-
-// Configure FirebaseUI.
-const uiConfig = {
-  // Popup signin flow rather than redirect flow.
-  signInFlow: "popup",
-  // We will display Google and Facebook as auth providers.
-  signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
-  callbacks: {
-    // Avoid redirects after sign-in.
-    signInSuccessWithAuthResult: () => false,
-  },
-};
+import Admin from "./screens/Admin";
 
 function App() {
   // Local signed-in state.
@@ -55,10 +44,13 @@ function App() {
   if (!isSignedIn)
     return (
       <div className="App">
-        <StyledFirebaseAuth
-          uiConfig={uiConfig}
-          firebaseAuth={firebaseApp.auth()}
-        />
+          <Container>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/*" element={<Navigate to="/"/>}/>
+            </Routes>
+         </Container>
       </div>
     );
 
@@ -69,8 +61,9 @@ function App() {
       <Container>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/checkup" element={<Questionnaire />} />
+          <Route path="/checkup/:active_theme" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </Container>
     </div>

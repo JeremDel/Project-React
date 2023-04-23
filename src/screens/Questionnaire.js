@@ -1,28 +1,58 @@
 import { Link } from "react-router-dom";
 
+import {useParams} from "react-router-dom"
+import { useState } from 'react'; 
+
+import { produce } from "immer"
 import questionnaire from "../data/questionnaire";
+
+
 
 import QuestionnaireNavBar from "./QuestionnaireNavBar";
 import QuestionnaireTheme from "./QuestionnaireTheme";
-import QuestionnaireQuestion from "./QuestionnaireQuestion";
+import { useEffect } from "react";
 export default function Questionnaire() {
+  
+  const { active_theme } = useParams();
+
+  const [q, setQ] = useState(questionnaire);
+  const [uq, setUQ] = useState({
+    uid: "UID1",
+    themes: questionnaire.themes.map(element => { return null })
+  });
+  const [themes, setThemes] = useState(questionnaire.themes.map(element => { return null }));
+
+  useEffect(() => {
+    console.log(themes);
+  }, [themes])
+
+  function setThemeInfo(id, info) {
+   // console.log(id, info);
+    setThemes(t => {
+      const nextState = produce(t, draftState => {
+        draftState[id] = info;
+      })  
+      return nextState;
+    })
+  }
+
+  let themeIndex = parseInt(active_theme)
 
   return (
     <div>
-        <p>QuestionnaireNavBar: </p>
-      <QuestionnaireNavBar questionnaire={questionnaire}></QuestionnaireNavBar>
+      <h1>Checkup</h1>
+
+      <QuestionnaireNavBar themes={ questionnaire.themes } activeTheme={ active_theme } filledThemes={ themes } />
+
+      <QuestionnaireTheme 
+        theme={ questionnaire.themes[themeIndex] } 
+        themeId={themeIndex}
+        key={ "active_theme-" + active_theme } 
+        onThemeChange={ setThemeInfo }></QuestionnaireTheme>
+
       <hr/>
-        <p>QuestionnaireTheme</p>
-        <QuestionnaireTheme theme={questionnaire.themes[0]}></QuestionnaireTheme>
-        <hr/>
-        <p>QuestionnaireQuestion</p>
-        <QuestionnaireQuestion question={questionnaire.themes[1].questions[0]}></QuestionnaireQuestion>
-      <hr/>
-        <Link to="https://stackoverflow.com/questions/27864951/how-to-access-a-childs-state-in-react/27875018#27875018">Some ide</Link>
-        <p>Fill out the questionnaire!</p>
-      <p>
-        <Link to="/">Go To The Home Page</Link>
-      </p>
+        <Link to="https://stackoverflow.com/questions/27864951/how-to-access-a-childs-state-in-react/27875018#27875018">Some ideas</Link>
+      
     </div>
   );
 }
