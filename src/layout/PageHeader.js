@@ -29,7 +29,7 @@ export default function PageHeader() {
                 setImageSrc(user.photoURL);
             } else {
                 const storage = getStorage();
-                const defaultImageRef = ref(storage, 'assets/defaultPfp.png');
+                const defaultImageRef = ref(storage, process.env.DEFAULT_PROFILE_PICTURE_PATH);
                 getDownloadURL(defaultImageRef).then((url) => {
                     setImageSrc(url);
                 });

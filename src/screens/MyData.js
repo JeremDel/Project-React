@@ -43,8 +43,6 @@ function UserForm(){
     const [alert, setAlert] = useState(<></>);
     const [imageSrc, setImageSrc] = useState('');
 
-    const defaultProfilePicture = "defaultPfp.png";
-
     useEffect(() => {
 
         // Get current user's id and then get the reference to the db
@@ -69,8 +67,7 @@ function UserForm(){
                     setImageSrc(userData.photoURL);
                 } else {
                     try {
-                        const path = 'assets/' + defaultProfilePicture;
-                        const storageRef = ref(getStorage(), path);
+                        const storageRef = ref(getStorage(), process.env.DEFAULT_PROFILE_PICTURE_PATH);
                         getDownloadURL(storageRef).then((url) => {
                             setImageSrc(url);
                         });
