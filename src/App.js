@@ -8,6 +8,7 @@ import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
 import Signup from "./screens/Signup";
 import { Container } from "reactstrap";
+import {UserProvider} from "./context/UserContext";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -57,7 +58,9 @@ function App() {
   // Signed in - Render app
   return (
     <div className="AppContainer">
-      <PageHeader></PageHeader>
+      <UserProvider>
+        <PageHeader/>
+      </UserProvider>
       <Container>
         <Routes>
           <Route path="/" element={<Home />} />
