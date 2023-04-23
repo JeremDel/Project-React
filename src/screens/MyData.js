@@ -424,17 +424,26 @@ function TeamManagementForm(){
                         setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
                         notifyUser();
                     } else {
-                        const updatedMembers = [...members, uid];
-                        setMembers(updatedMembers);
+                        // Check if user is a leader
+                        const groupQuery = groupCollection.where('leader', "==", uid);
+                        groupQuery.get().then((doc) => {
+                            if(!doc.empty){
+                                setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
+                                notifyUser();
+                            } else {
+                                const updatedMembers = [...members, uid];
+                                setMembers(updatedMembers);
 
-                        const groupRef = firebase.firestore().collection('groups').doc(groupUid);
-                        groupRef.update({
-                            members: updatedMembers
-                        }).then(() => {
-                            setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
-                            notifyUser();
-                        }).catch((exception) => {
-                            console.log('Oh no! There was an error: ', exception);
+                                const groupRef = firebase.firestore().collection('groups').doc(groupUid);
+                                groupRef.update({
+                                    members: updatedMembers
+                                }).then(() => {
+                                    setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
+                                    notifyUser();
+                                }).catch((exception) => {
+                                    console.log('Oh no! There was an error: ', exception);
+                                });
+                            }
                         });
                     }
                     setEmail('');
