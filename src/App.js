@@ -1,7 +1,5 @@
 import "./App.css";
-import firebase from "firebase/compat/app";
 import firebaseApp from "./initFirebase";
-import { StyledFirebaseAuth } from "react-firebaseui";
 import { useEffect, useState } from "react";
 import {Routes, Route, Navigate} from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
