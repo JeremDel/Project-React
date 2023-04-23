@@ -283,7 +283,6 @@ function TeamManagementForm(){
 
     // Current user's group data
     const [groupUid, setGroupUid] = useState('');
-    const [groupName, setGroupName] = useState('');
     const [members, setMembers] = useState([]);
     const [membersNames, setMembersNames] = useState([]);
     const [leaderName, setLeaderName] = useState('');
@@ -315,10 +314,9 @@ function TeamManagementForm(){
 
                 // Assign the values of the group to the state variables
                 const data = group.docs[0].data();
-                setGroupName(data.name);
                 setMembers(data.members);
 
-                setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {groupName}</h3>);
+                setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {data.name}</h3>);
             } else {
                 // User is not a leader, but maybe he's a member
                 const query = groups.where('members', "array-contains", id);
@@ -329,7 +327,6 @@ function TeamManagementForm(){
                         setGroupUid(group.docs[0].id);
 
                         const data = group.docs[0].data();
-                        setGroupName(data.name);
                         setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Member of the team: {data.name}</h3>);
 
                         // Store leader's name
