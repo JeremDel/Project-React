@@ -9,7 +9,11 @@ export default class QuestionnaireTheme extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          questions: this.props.theme.questions.map((e, i) => { return { valid: false, answers: [] } })
+          questions: this.props.theme.questions.map((e, i) => null),
+          currentQuestion: 0,
+          totPoints: 0,
+          recommendations: [],
+          valid: false
         };
         this.onQuestionStateChange = this.onQuestionStateChange.bind(this);
       }    
@@ -31,11 +35,32 @@ export default class QuestionnaireTheme extends React.Component {
             const nextState = produce(state, draftState => {
                 draftState.questions[questionId] = qState;
 
-                // if ()
-                // Set a valid state when Flow type will be defined
+                let validQuestions = 0;
+                draftState.totPoints = 0;
+                draftState.recommendations = [];
+                this.props.theme.questions.forEach((q, qi) => {
+                    if (draftState.questions[qi] !== null) {
+                        if (draftState.questions[qi].length) {
+                            validQuestions++;
+                        }
+                        draftState.questions[qi].forEach(ai => {
+                            let answer = q.answers[ai];
+                            draftState.totPoints += answer.points;
+
+                            if (answer.recommendation) {
+                                draftState.recommendations.push(answer.recommendation);
+                            }
+                            else if (answer.recommendations) {
+                                draftState.recommendations = draftState.recommendations.concat(answer.recommendations)
+                            }
+                        })
+                    }
+                })
+
+                draftState.valid = validQuestions === this.props.theme.questions.length;
             })
 
-            return { questions: nextState }
+            return nextState
         }, () => { 
             this.props.onThemeChange(this.props.themeId, this.state) 
         })
@@ -51,22 +76,17 @@ export default class QuestionnaireTheme extends React.Component {
         }
         else {
             let questionList = this.props.theme.questions;
-            // console.log(questionList);
             return (
                 <>
                 {
                     questionList.map((question, index) => <QuestionnaireQuestion question={ question } questionId={ index } type={ this.props.theme.type } key={'q-' + index} onStateChange={ this.onQuestionStateChange } />)
                 }              
                 </>
-
             );
         }
     }
 
     render() {
-
-        // console.log(this.props);
-
         return (
             <div>
                 <Row>

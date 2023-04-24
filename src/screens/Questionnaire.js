@@ -49,10 +49,7 @@ export default function Questionnaire() {
         themeId={themeIndex}
         key={ "active_theme-" + active_theme } 
         onThemeChange={ setThemeInfo }></QuestionnaireTheme>
-
-      <hr/>
-        <Link to="https://stackoverflow.com/questions/27864951/how-to-access-a-childs-state-in-react/27875018#27875018">Some ideas</Link>
-      
+     
     </div>
   );
 }
