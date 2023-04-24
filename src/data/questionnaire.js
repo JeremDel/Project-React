@@ -512,6 +512,7 @@ const questionnaire = {
     {
       name: "Fear of the void",
       type: "Single",
+      radarInversePoints: true,
       radarName: "Not afraid of the void",
       info: "Explanation: Fear of heights is a real phobia (phobia = fear) and is not to be confused with vertigo, which is a physiological phenomenon). The fear of heights can be triggered by the simple thought of being in height.",
       questions: [
@@ -560,6 +561,7 @@ const questionnaire = {
     {
       name: "Pain",
       type: "Multiple",
+      radarInversePoints: true,
       radarName: "Painless",
       questions: [
         {
@@ -597,6 +599,7 @@ const questionnaire = {
     {
       name: "Mobility",
       type: "Multiple",
+      radarInversePoints: true,
       radarName: "Mobility",
       questions: [
         {
