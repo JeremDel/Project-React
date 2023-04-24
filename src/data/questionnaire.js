@@ -10,6 +10,7 @@ const questionnaire = {
       type: "Flow",
       radarName: "Physical activity",
       defaultPoints: 1,
+      maxPoints: 6,
       questions: [
         {
           id: "q1",
@@ -131,6 +132,7 @@ const questionnaire = {
     },
     {
       name: "Walking aids",
+      maxPoints: 5,
       type: "Single",
       radarName: "Walking without aids",
       questions: [
@@ -167,6 +169,7 @@ const questionnaire = {
     },
     {
       name: "Walking speed",
+      maxPoints: 5,
       type: "Single",
       radarName: "Walking speed",
       questions: [
@@ -206,6 +209,7 @@ const questionnaire = {
     },
     {
       name: "Walking time",
+      maxPoints: 60,
       type: "Single",
       radarName: "Walking time",
       info: "Choose the maximum time you think you can maintain at the following paces easily, on level ground and without stopping to rest:",
@@ -337,6 +341,7 @@ const questionnaire = {
     {
       name: "Go up",
       type: "Single",
+      maxPoints: 27,
       radarName: "Ability to climb",
       Info: "Stair climbing: Record the degree of physical difficulty that best describes how difficult it was for you to climb stairs, without stopping to rest, during the past week.",
       questions: [
@@ -441,6 +446,7 @@ const questionnaire = {
     },
     {
       name: "Security walk",
+      maxPoints: 5,
       type: "Single",
       radarName: "Insecurity walk",
       questions: [
@@ -510,6 +516,7 @@ const questionnaire = {
       ],
     },
     {
+      maxPoints: 1,
       name: "Fear of the void",
       type: "Single",
       radarInversePoints: true,
@@ -534,6 +541,7 @@ const questionnaire = {
       ],
     },
     {
+      maxPoints: 2,
       name: "Balance",
       type: "Single",
       radarName: "Balance",
@@ -559,6 +567,7 @@ const questionnaire = {
       ],
     },
     {
+      maxPoints: 5,
       name: "Pain",
       type: "Multiple",
       radarInversePoints: true,
@@ -597,6 +606,7 @@ const questionnaire = {
       ],
     },
     {
+      maxPoints: 3,
       name: "Mobility",
       type: "Multiple",
       radarInversePoints: true,
