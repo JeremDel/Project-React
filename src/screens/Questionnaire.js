@@ -6,17 +6,12 @@ import { useState } from 'react';
 import { produce } from "immer"
 import questionnaire from "../data/questionnaire";
 
-
-
 import QuestionnaireNavBar from "./QuestionnaireNavBar";
 import QuestionnaireTheme from "./QuestionnaireTheme";
 import { useEffect } from "react";
 import { Button } from "reactstrap";
 
-
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
-
+import { addUserQuestionnaire } from '../data/userQuestionnaire';
 
 
 export default function Questionnaire() {
@@ -28,18 +23,17 @@ export default function Questionnaire() {
     uid: "UID1",
     themes: questionnaire.themes.map(element => { return null })
   });
-  const [themes, setThemes] = useState(questionnaire.themes.map(element => { return null }));
-  
-  const id = firebase.auth().currentUser.uid;
-  const user = firebase.firestore().collection('users').doc(id);
+  const [themes, setThemes] = useState(questionnaire.themes.map((element, i) => { return i === 0 ? true: false }));
 
   useEffect(() => {
     console.log(themes);
   }, [themes])
 
-  function saveQuestionnaire() {
-
+  async function saveQuestionnaire() {
+    console.log('saveQuestionnaire')
+    addUserQuestionnaire(q)
   }
+
 
   function setThemeInfo(id, info) {
    // console.log(id, info);
@@ -51,24 +45,11 @@ export default function Questionnaire() {
         } else {
 
         }
-        
-        // draftState[id] = info;
       });
 
       return nextState;
     })
-/*     setThemes(t => {
-      const nextState = produce(t, draftState => {
-        if (info.valid) {
-          themes[active_theme] = info;
-        } else {
 
-        }
-
-        draftState[id] = info;
-      })  
-      return nextState;
-    }) */
   }
 
   let themeIndex = parseInt(active_theme)
