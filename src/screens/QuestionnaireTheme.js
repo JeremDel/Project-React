@@ -76,7 +76,7 @@ export default class QuestionnaireTheme extends React.Component {
 
     onFlowQuestionChange(questionId, qState) {
         console.log(questionId, qState);
-        // return;
+
         this.setState(state => {
 
             const nextState = produce(state, draftState => {
@@ -87,8 +87,6 @@ export default class QuestionnaireTheme extends React.Component {
                     draftState.theme.recommendations = [];
                 }
 
-                console.log(state.theme.questions[questionId])
-                // return;
                 let answer = draftState.theme.questions[questionId].answers[qState[0]];
 
                 if (answer.hasOwnProperty('points')) {
@@ -141,7 +139,7 @@ export default class QuestionnaireTheme extends React.Component {
 
             return nextState; 
         }, () => { 
-            // this.props.onThemeChange(this.props.themeId, this.state.theme) 
+            this.props.onThemeChange(this.props.themeId, this.state.theme) 
         })        
     }
 
