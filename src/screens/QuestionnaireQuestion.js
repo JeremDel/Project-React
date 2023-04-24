@@ -1,4 +1,5 @@
 // import { Link } from "react-router-dom";
+import { produce } from 'immer';
 import React from 'react';
 import {
     Button,
@@ -17,9 +18,21 @@ export default class QuestionnaireQuestion extends React.Component {
 
     constructor(props) {
         super(props);
+
+        let selectedOptions = [];
+        if (this.props.question.hasOwnProperty('selectedOptions')) {
+            selectedOptions = this.props.question.selectedOptions;
+        }
+
         this.state = {
-          answers: [],
-          disabledCheckbox: []
+            selectedOptions: selectedOptions,
+        // };
+
+        // this.state = {
+            // theme: this.props.theme,
+            // answers: this.props.question,
+        //   answers: answers,
+            disabledCheckbox: []
         };
         this.toggleRadio = this.toggleRadio.bind(this);
         this.toggleCheckbox = this.toggleCheckbox.bind(this);
@@ -47,11 +60,11 @@ export default class QuestionnaireQuestion extends React.Component {
       }
     
       toggleRadio(event) {
-        this.setState({ answers: [ parseInt(event.target.value) ]}, this.triggerNewState);
+        this.setState({ selectedOptions: [ parseInt(event.target.value) ]}, this.triggerNewState);
       }
 
       triggerNewState() {
-        this.props.onStateChange(this.props.questionId, this.state.answers)
+        this.props.onStateChange(this.props.questionId, this.state.selectedOptions)
       }
 
       toggleCheckbox(event) {
@@ -62,12 +75,12 @@ export default class QuestionnaireQuestion extends React.Component {
         
         this.setState(state => { 
             let newState = {
-                answers : [],
+                selectedOptions : [],
                 disabledCheckbox : state.disabledCheckbox
             }
 
             if (t.checked) {
-                newState.answers = [...state.answers, value].sort();
+                newState.selectedOptions = [...state.selectedOptions, value].sort();
 
                 if (this.props.question.answers[value].exclusive) {
                     // Disable other checkboxes
@@ -78,9 +91,9 @@ export default class QuestionnaireQuestion extends React.Component {
                 }
             } 
             else {
-                newState.answers = state.answers.filter(v => v !== value).sort()
+                newState.selectedOptions = state.selectedOptions.filter(v => v !== value).sort()
 
-                if (newState.answers.length === 0) {
+                if (newState.selectedOptions.length === 0) {
                     // remove disabling checkboxes
                     newState.disabledCheckbox = []
                 }
@@ -92,26 +105,28 @@ export default class QuestionnaireQuestion extends React.Component {
         }, this.triggerNewState)
     }
 
-    formControl(questionId, answerId) {
+    formControl(questionId, answerId, answer) {
 
 
         if (this.props.type === 'Single') {
             return <input 
                     type="radio" 
                     name={ questionId } 
-                    value={ answerId } 
-                    onChange={ this.toggleRadio }
+                    value={ answerId }
+                    checked={ this.state.selectedOptions.indexOf(answerId) > -1 }
+                    onChange={ (e) => this.toggleRadio(e, answer) }
                      />
         }
 
         if (this.props.type === 'Multiple') {
-            console.log(typeof answerId);
+            // console.log(typeof answerId);
 
             return <input 
                     type="checkbox" 
                     name={ questionId + "[" + answerId + "]"} 
                     value={ answerId } 
-                    onChange={ this.toggleCheckbox }
+                    checked={ this.state.selectedOptions.indexOf(answerId) > -1 }
+                    onChange={ (e) => this.toggleCheckbox(e, answer) }
                     disabled={ this.state.disabledCheckbox.indexOf(answerId) > -1 }
                      />
         }
@@ -132,7 +147,7 @@ export default class QuestionnaireQuestion extends React.Component {
                                     return (
                                         <li key={ 'a-' + index }>
                                             <label>
-                                                { this.formControl(this.props.questionId, index) }
+                                                { this.formControl(this.props.questionId, index, answer) }
                                                 &nbsp;
                                                 { answer.label }
                                             </label>

@@ -9,11 +9,12 @@ export default class QuestionnaireTheme extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          questions: this.props.theme.questions.map((e, i) => null),
+            theme: this.props.theme,
+        //   questions: this.props.theme.questions.map((e, i) => null),
           currentQuestion: 0,
-          totPoints: 0,
-          recommendations: [],
-          valid: false
+        //   totPoints: 0,
+        //   recommendations: [],
+        //   valid: false
         };
         this.onQuestionStateChange = this.onQuestionStateChange.bind(this);
       }    
@@ -30,20 +31,26 @@ export default class QuestionnaireTheme extends React.Component {
 
     onQuestionStateChange(questionId, qState) {
 
+        // console.log(questionId, qState);
+        // return
         this.setState(state => {
 
-            const nextState = produce(state, draftState => {
-                draftState.questions[questionId] = qState;
+            const nextState = produce(state.theme, draftState => {
+
+                
+                draftState.questions[questionId].selectedOptions = qState;
 
                 let validQuestions = 0;
                 draftState.totPoints = 0;
                 draftState.recommendations = [];
-                this.props.theme.questions.forEach((q, qi) => {
-                    if (draftState.questions[qi] !== null) {
-                        if (draftState.questions[qi].length) {
+
+                draftState.questions.forEach((q, qi) => {
+                    if (q.hasOwnProperty('selectedOptions')) {
+                        if (q.selectedOptions.length) {
                             validQuestions++;
                         }
-                        draftState.questions[qi].forEach(ai => {
+
+                        q.selectedOptions.forEach(ai => {
                             let answer = q.answers[ai];
                             draftState.totPoints += answer.points;
 
@@ -60,9 +67,9 @@ export default class QuestionnaireTheme extends React.Component {
                 draftState.valid = validQuestions === this.props.theme.questions.length;
             })
 
-            return nextState
+            return {theme: nextState}; 
         }, () => { 
-            this.props.onThemeChange(this.props.themeId, this.state) 
+            this.props.onThemeChange(this.props.themeId, this.state.theme) 
         })
     }
 
