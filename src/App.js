@@ -61,7 +61,7 @@ function App() {
       <Container>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/checkup/:active_theme" element={<Questionnaire/>} />
+          <Route path="/checkup" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
