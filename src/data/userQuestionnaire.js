@@ -11,11 +11,33 @@ export async function addUserQuestionnaire(questionnaire) {
   const user = auth.currentUser;
   const uid = user.uid;
   const q = produce(questionnaire, draft => {
+
+    // Add some informations
     draft.uid = uid;
     draft.datetime = new Date();
+
+    // Cleanup user questionnaire unused fields
+    draft.themes.forEach(theme => {
+      theme.questions.forEach(question => {
+        let selectedOptions = question.selectedOptions;
+
+        let answers = question.answers.filter(element, index => {
+            return selectedOptions.indexOf(index) > -1;
+        }).map(answer => answer.label);
+        
+        question.answers = answers;
+
+        delete question.id;
+      });
+
+      theme.questions = theme.questions.filter(question => question.answers.length > 0);
+
+      if (theme.hasOwnProperty('defaultPoints'))
+        delete theme.defaultPoints;
+
+      delete theme.type;
+    });
   });  
-  // questionnaire.uid = uid;
-  // questionnaire.datetime = new Date();
   
   const coll = collection(db, "userQuestionnaires");
   const docRef = await addDoc(coll, q);
