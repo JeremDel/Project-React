@@ -48,6 +48,11 @@ export default function PageHeader() {
                             </NavLink>
                         </NavItem>
                         <NavItem>
+                            <NavLink href="/radar">
+                                Radar
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
                             <NavLink href="/admin">
                                 Admin
                             </NavLink>

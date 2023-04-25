@@ -14,6 +14,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
 import Admin from "./screens/Admin";
+import Radar from "./screens/RadarUser";
 
 function App() {
   // Local signed-in state.
@@ -63,6 +64,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/checkup" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
+          <Route path="/radar" element={<Radar />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
       </Container>
