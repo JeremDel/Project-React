@@ -6,9 +6,41 @@ export async function addUserQuestionnaire(questionnaire) {
   // Get user id
   const uid = getAuth().currentUser.uid;
 
-  // Append the current date to the questionnaire
   const newQuestionnaire = produce(questionnaire, draft => {
+    // Add some informations
+    // Append the current date to the questionnaire
     draft.datetime = new Date();
+ 
+     // Cleanup user questionnaire unused fields
+     draft.themes.forEach(theme => {
+       theme.questions.forEach(question => {
+         if (! question.hasOwnProperty('selectedOptions')) {
+           question.selectedOptions = [];
+         }
+         
+         let selectedOptions = question.selectedOptions;
+ 
+         let answers = question.answers.filter((element, index) => {
+             return selectedOptions.indexOf(index) > -1;
+         }).map(answer => answer.label);
+         
+         question.answers = answers;
+ 
+         if (question.hasOwnProperty('id'))
+           delete question.id;
+ 
+         delete question.selectedOptions;
+       });
+ 
+       theme.questions = theme.questions.filter(question => question.answers.length > 0);
+ 
+       if (theme.hasOwnProperty('defaultPoints'))
+         delete theme.defaultPoints;
+ 
+       delete theme.type;
+       delete theme.valid;
+     });
+     delete draft.valid;
   });
 
   // Get the document with the user id from the collection userQuestionnaires
