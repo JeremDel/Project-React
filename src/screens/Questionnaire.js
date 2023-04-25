@@ -1,15 +1,10 @@
-import { Link } from "react-router-dom";
-
-import {useParams} from "react-router-dom"
 import { Nav, NavItem, NavLink } from "reactstrap";
-import React, { useState } from 'react'; 
+import React from 'react'; 
 
 import { produce } from "immer"
 import questionnaire from "../data/questionnaire";
 
-import QuestionnaireNavBar from "./QuestionnaireNavBar";
 import QuestionnaireTheme from "./QuestionnaireTheme";
-import { useEffect } from "react";
 import { Button } from "reactstrap";
 
 import { addUserQuestionnaire } from '../data/userQuestionnaire';
@@ -29,19 +24,6 @@ export default class Questionnaire extends React.Component {
     this.saveQuestionnaire = this.saveQuestionnaire.bind(this);
   } 
 
-  // const { active_theme } = useParams();
-
-  // const [q, setQ] = useState(questionnaire);
-  // const [uq, setUQ] = useState({
-  //   uid: "UID1",
-  //   themes: questionnaire.themes.map(element => { return null })
-  // });
-  // const [themes, setThemes] = useState(questionnaire.themes.map((element, i) => { return i === 0 ? true: false }));
-
-  // useEffect(() => {
-  //   console.log(themes);
-  // }, [themes])
-
   async saveQuestionnaire() {
     console.log('saveQuestionnaire')
     addUserQuestionnaire(this.state.questionnaire)
@@ -49,38 +31,24 @@ export default class Questionnaire extends React.Component {
 
 
   setThemeInfo(id, theme) {
-   // console.log(id, info);
     this.setState(state => {
       const nextState = produce(state.questionnaire, draftState => {
         draftState.themes[id] = theme;
-        // if (info.valid) {
-        //   draftState.themes[id].points = info.totPoints;
-        //   draftState.themes[id].recommendations = info.recommendations;
-        // } else {
-
-        // }
       });
 
       console.log(nextState)
       return { questionnaire: nextState };
     })
-
   }
 
-
-
-  // let themeIndex = parseInt(active_theme)
-
+  
   render() {
-    let themes = this.state.questionnaire.themes;
-    let activeTheme = themes[this.state.currentTheme];
     return (
       <div>
         <h1>Checkup</h1>
 
         <Nav tabs>
-
-        {
+          {
             this.state.questionnaire.themes.map((theme, index) => (
                 <NavItem key={ 'theme-' + index}>
                     <NavLink
@@ -90,11 +58,11 @@ export default class Questionnaire extends React.Component {
                         }}
                         role="button"
                     >
-                        {theme.name}
+                      {theme.name}
                     </NavLink>
                 </NavItem>
             )) 
-        }
+          }
         </Nav>
 
         <QuestionnaireTheme 
@@ -104,8 +72,6 @@ export default class Questionnaire extends React.Component {
           onThemeChange={ this.setThemeInfo }></QuestionnaireTheme>
 
         <Button onClick={ this.saveQuestionnaire }>Save</Button>
-        
-      
       </div>
     );
   }

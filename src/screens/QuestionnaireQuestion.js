@@ -1,18 +1,5 @@
-// import { Link } from "react-router-dom";
-import { produce } from 'immer';
 import React from 'react';
-import {
-    Button,
-    Col,
-    Form,
-    FormGroup,
-    Input,
-    Label,
-    ListGroup,
-    ListGroupItem,
-    Row,
-    UncontrolledAlert
-} from 'reactstrap'
+
 
 export default class QuestionnaireQuestion extends React.Component {
 
@@ -26,23 +13,10 @@ export default class QuestionnaireQuestion extends React.Component {
 
         this.state = {
             selectedOptions: selectedOptions,
-        // };
-
-        // this.state = {
-            // theme: this.props.theme,
-            // answers: this.props.question,
-        //   answers: answers,
             disabledCheckbox: []
         };
         this.toggleRadio = this.toggleRadio.bind(this);
         this.toggleCheckbox = this.toggleCheckbox.bind(this);
-
-       /*  this.answers = this.props.question.answers.map((a, i) => {
-            return {
-                answer: a,
-                index: i
-            };
-        }) */
 
         this.exclusiveAnswers = [];
         this.nonExclusiveAnswers = [];
@@ -55,8 +29,6 @@ export default class QuestionnaireQuestion extends React.Component {
                 this.nonExclusiveAnswers.push(index);
             }
         });
-
-        // this.exclusiveAnswers = this.answers.filter(el => el.a.exclusive ? true: false).map(el => el.index)
       }
     
       toggleRadio(event) {
@@ -69,10 +41,8 @@ export default class QuestionnaireQuestion extends React.Component {
 
       toggleCheckbox(event) {
         let t = event.target;
-        console.log(t.name, t.value);
         let value = parseInt(t.value);
-        
-        
+                
         this.setState(state => { 
             let newState = {
                 selectedOptions : [],
@@ -98,15 +68,12 @@ export default class QuestionnaireQuestion extends React.Component {
                     newState.disabledCheckbox = []
                 }
             }
-            
-            //this.triggerNewState(newState)
 
             return newState
         }, this.triggerNewState)
     }
 
     formControl(questionId, answerId, answer) {
-
 
         if (this.props.type === 'Single') {
             return <input 
@@ -119,7 +86,6 @@ export default class QuestionnaireQuestion extends React.Component {
         }
 
         if (this.props.type === 'Multiple') {
-            // console.log(typeof answerId);
 
             return <input 
                     type="checkbox" 
@@ -136,33 +102,24 @@ export default class QuestionnaireQuestion extends React.Component {
     render(){
         
         return (
-            <div>
-                <Row>
-                    <Col md={9}>
-                                
-                        <p><b>{this.props.question.label}</b></p>
-                        <ul className="answersList">
-                            {
-                                this.props.question.answers.map((answer, index) => {
-                                    return (
-                                        <li key={ 'a-' + index }>
-                                            <label>
-                                                { this.formControl(this.props.questionId, index, answer) }
-                                                &nbsp;
-                                                { answer.label }
-                                            </label>
-                                        </li>
-                                    )
-                                })
-                            }                
-                        </ul>
-
-                    </Col>
-                    <Col md={3}>
-                        <pre>{ JSON.stringify(this.state, null, 4) }</pre>
-                    </Col>
-                </Row>
-            </div>
+            <>
+                <p><b>{this.props.question.label}</b></p>
+                <ul className="answersList">
+                    {
+                        this.props.question.answers.map((answer, index) => {
+                            return (
+                                <li key={ 'a-' + index }>
+                                    <label>
+                                        { this.formControl(this.props.questionId, index, answer) }
+                                        &nbsp;
+                                        { answer.label }
+                                    </label>
+                                </li>
+                            )
+                        })
+                    }                
+                </ul>
+            </>
         );
     } 
 }
