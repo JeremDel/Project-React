@@ -19,15 +19,22 @@ export async function addUserQuestionnaire(questionnaire) {
     // Cleanup user questionnaire unused fields
     draft.themes.forEach(theme => {
       theme.questions.forEach(question => {
+        if (! question.hasOwnProperty('selectedOptions')) {
+          question.selectedOptions = [];
+        }
+        
         let selectedOptions = question.selectedOptions;
 
-        let answers = question.answers.filter(element, index => {
+        let answers = question.answers.filter((element, index) => {
             return selectedOptions.indexOf(index) > -1;
         }).map(answer => answer.label);
         
         question.answers = answers;
 
-        delete question.id;
+        if (question.hasOwnProperty('id'))
+          delete question.id;
+
+        delete question.selectedOptions;
       });
 
       theme.questions = theme.questions.filter(question => question.answers.length > 0);
@@ -36,7 +43,9 @@ export async function addUserQuestionnaire(questionnaire) {
         delete theme.defaultPoints;
 
       delete theme.type;
+      delete theme.valid;
     });
+    delete draft.valid;
   });  
   
   const coll = collection(db, "userQuestionnaires");
