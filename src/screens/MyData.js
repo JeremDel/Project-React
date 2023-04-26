@@ -16,6 +16,7 @@ import firebase from "firebase/compat/app";
 import firebaseApp from '../initFirebase';
 import "firebase/compat/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import {useNavigate} from "react-router-dom";
 
 function CustomAlert(props){
     return(
@@ -521,14 +522,26 @@ function TeamManagementForm(){
 }
 
 function CheckUpList() {
+    const navigate = useNavigate();
+
     // State to store the content that will be rendered at the website
     const [checkups, setCheckups] = useState(<></>);
+
+    const [isHovered, setIsHovered] = useState(false);
 
     // Current user's id
     const uid = firebaseApp.auth().currentUser.uid;
 
     // Document with all the user's forms
     const doc = firebaseApp.firestore().collection('userQuestionnaires').doc(uid);
+
+
+    const getRadar = (prettydate) => {
+        const date = new Date(Date.parse(prettydate.replace(/(\d{2})\.(\d{2})\.(\d{4}) @/, '$3-$2-$1T').replace(/\s/, '')));
+
+        navigate(`/radar/${date}`);
+    }
+
 
     useEffect(() => {
         doc.get().then((snapshot) => {
@@ -551,7 +564,7 @@ function CheckUpList() {
                     console.log('Im here');
 
                     return(
-                        <ListGroupItem key={index}>
+                        <ListGroupItem key={index} style={{cursor: 'pointer', textAlign: 'center'}} onClick={() => getRadar(prettyDate)}>
                             {prettyDate}
                         </ListGroupItem>
                     );

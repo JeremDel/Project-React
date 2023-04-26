@@ -5,8 +5,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Timestamp } from "firebase/firestore";
 import {MyRecommendations, MyResponsiveRadar, MyResults, MyAnswers} from "./RadarPlotUser";
 import {Col, List, Row} from "reactstrap";
+import {useParams} from "react-router-dom";
 
 function RadarFrom() {
+    // Get the date from the parameter
+    const givenDate = useParams();
+    const d = Timestamp.fromDate(new Date(givenDate.date));
+
     // State where the radar (from RadarPlotUser.js) will be stored to be displayed
     const [radar, setRadar] = useState(<></>);
     const [results, setResults] = useState(<></>);
@@ -27,7 +32,7 @@ function RadarFrom() {
                 const originalDate = new Date('April 26, 2023 11:04:29 PM UTC+2');
 
                 // Convert the date to a timestamp, since that's how firestore stores dates
-                const timestampToSearch = Timestamp.fromDate(originalDate);
+                const timestampToSearch = Timestamp.fromDate(new Date(givenDate.date));
 
                 let arrayContainingDatetime; // Empty variable that will store the form once it has been found
                 for (const formObject in forms) {
@@ -87,13 +92,13 @@ function RadarFrom() {
                 {radar}
             </Row>
             <Row style={{marginTop: '10vh', justifyContent: "center"}}>
-                <Col md={6}>
+                <Col md={4}>
                     <h2>Results</h2>
                     <List type={"unstyled"}>
                         {results}
                     </List>
                 </Col>
-                <Col md={6} style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
+                <Col md={8} style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                     <h2>Recommendations</h2>
                     <List type={"unstyled"}>
                         {recommendations}
