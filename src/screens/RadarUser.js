@@ -3,7 +3,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Timestamp } from "firebase/firestore";
-import {MyRecommendations, MyResponsiveRadar, MyResults, MyAnswers} from "../data/RadarPlotUser";
+import {MyRecommendations, MyResponsiveRadar, MyResults, MyAnswers} from "./RadarPlotUser";
 import {Col, List, Row} from "reactstrap";
 
 function RadarFrom() {
@@ -24,7 +24,7 @@ function RadarFrom() {
                 const forms = doc.data().questionnaires;
 
                 // TODO: remove this, testing purposes --> We should get the date as an argument
-                const originalDate = new Date('April 26, 2023 05:16:45 PM UTC+2');
+                const originalDate = new Date('April 26, 2023 11:04:29 PM UTC+2');
 
                 // Convert the date to a timestamp, since that's how firestore stores dates
                 const timestampToSearch = Timestamp.fromDate(originalDate);
