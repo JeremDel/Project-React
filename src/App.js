@@ -7,6 +7,7 @@ import {Routes, Route, Navigate} from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
 import Signup from "./screens/Signup";
+import MyFunction from "./screens/RadarUser";
 import { Container } from "reactstrap";
 
 
@@ -66,6 +67,7 @@ function App() {
           <Route path="/my-data" element={<MyData />} />
           <Route path="/radar" element={<Radar />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/radar/:date" element={<MyFunction />} />
         </Routes>
       </Container>
     </div>
