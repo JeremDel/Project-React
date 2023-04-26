@@ -7,6 +7,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Button, Form, FormGroup, Label, Input, Alert, Col, Row} from 'reactstrap';
+import {addDoc} from "firebase/firestore/lite";
 
 const Signup = () => {
     // Initialize state for form data
@@ -23,6 +24,8 @@ const Signup = () => {
     });
 
     const [errorMessage, setErrorMessage] = useState(null);
+    const [feedback, setFeedback] = useState('');
+    const [groupName, setGroupName] = useState('');
 
     const navigate = useNavigate();
 
@@ -30,6 +33,14 @@ const Signup = () => {
     const handleInputChange = (event) => {
         const { name, value, type, checked } = event.target;
         setFormValues({ ...formValues, [name]: type === 'checkbox' ? checked : value });
+
+        if (event.target.name === 'password'){
+            if(value.length < 6){
+                setFeedback('Password must be at least 6 characters long');
+            } else {
+                setFeedback('');
+            }
+        }
     };
 
     // Update profile picture
@@ -44,11 +55,20 @@ const Signup = () => {
 
         const { firstName, lastName, email, birthdate, sex, password, repeatPassword, profileImage, isLeader } = formValues;
 
-        // Check if passwords match
+        // Checks before continuing
         if (password !== repeatPassword) {
             setErrorMessage("Passwords don't match");
             return;
         }
+        if(password.length < 6){
+            setErrorMessage("Password must be at least 6 characters long!");
+            return;
+        }
+        if (isLeader && groupName.length === 0){
+            setErrorMessage('You need to select a name for your group!');
+            return;
+        }
+
         try {
             // Create a new user with the email and password
             const userCredential = await firebaseApp
@@ -88,6 +108,16 @@ const Signup = () => {
                 photoURL,
                 isLeader
             });
+
+            if(isLeader){
+                const groupsCollection = firebaseApp.firestore().collection('groups');
+                const newGroup = {
+                    leader: user.uid,
+                    members: [],
+                    name: groupName
+                };
+                await  groupsCollection.add(newGroup);
+            }
 
             // TODO Redirect to home page after successful registration
             navigate("/");
@@ -168,6 +198,11 @@ const Signup = () => {
                 <FormGroup>
                     <Label for="password">Password</Label>
                     <Input type="password" name="password" id="password" value={formValues.password} onChange={handleInputChange} required />
+                    {feedback &&
+                        (
+                            <Label style={{color: "red"}}>Password must be at least 6 characters long.</Label>
+                        )
+                    }
                 </FormGroup>
                 <FormGroup>
                     <Label for="confirmPassword">Confirm Password</Label>
@@ -179,12 +214,20 @@ const Signup = () => {
                         I want to be a group leader !
                     </Label>
                 </FormGroup>
+                {
+                    formValues.isLeader && (
+                        <FormGroup>
+                            <Label htmlFor={"groupName"}>Group name</Label>
+                            <Input type={"text"} name={"groupName"} onChange={(event) => {setGroupName(event.target.value)}}/>
+                        </FormGroup>
+                    )
+                }
                 <FormGroup>
                     <Label for="profileImage">Profile Image</Label>
                     <Input type="file" name="profileImage" id="profileImage" onChange={handleFileInputChange} />
                 </FormGroup>
                 <center>
-                    <Button color="primary" type="submit" onClick={handleSubmit}>Sign up</Button>
+                    <Button color="primary" type="submit" onClick={handleSubmit} disabled={feedback ? true : false}>Sign up</Button>
                 </center>
             </Form>
         </>
