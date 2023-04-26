@@ -13,6 +13,7 @@ import {
 } from 'reactstrap';
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
+import firebaseApp from '../initFirebase';
 import "firebase/compat/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
@@ -446,14 +447,76 @@ function TeamManagementForm(){
     );
 }
 
+function CheckUpList() {
+    // State to store the content that will be rendered at the website
+    const [checkups, setCheckups] = useState(<></>);
+
+    // Current user's id
+    const uid = firebaseApp.auth().currentUser.uid;
+
+    // Document with all the user's forms
+    const doc = firebaseApp.firestore().collection('userQuestionnaires').doc(uid);
+
+    useEffect(() => {
+        doc.get().then((snapshot) => {
+            if(snapshot.exists){
+                // The user has already filled at least 1 checkup
+
+                const checkups = snapshot.data().questionnaires;
+                const dates = checkups.map((checkup, index) => {
+                    const formDate = checkup.datetime.toDate();
+                    const prettyDate = formDate.toLocaleString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                    }).replace('/', '.').replace('/', '.').replace(' ', ' @ ').replace(',', '');
+
+                    console.log('Im here');
+
+                    return(
+                        <ListGroupItem key={index}>
+                            {prettyDate}
+                        </ListGroupItem>
+                    );
+                });
+
+                // Store the formatted dates in the state to be rendered
+                setCheckups(dates);
+            } else {
+
+            }
+        }).catch((error) => {
+            console.log('Oh no! There was an error: ', error);
+        });
+    }, []);
+
+    return(
+        <>
+            <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>My checkups</h3>
+            <ListGroup>
+                {checkups}
+            </ListGroup>
+        </>
+
+    );
+
+}
+
 export default function MyFunction(){
 
     return(
         <>
             <UserForm/>
             <Row style={{marginBottom: "10vh"}}>
-                <Col md={6}>
+                <Col md={7}>
                     <TeamManagementForm/>
+                </Col>
+                <Col md={5}>
+                    <CheckUpList/>
                 </Col>
             </Row>
         </>
