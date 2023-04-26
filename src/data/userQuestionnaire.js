@@ -36,6 +36,9 @@ export async function addUserQuestionnaire(questionnaire) {
  
        if (theme.hasOwnProperty('defaultPoints'))
          delete theme.defaultPoints;
+
+       if (theme.hasOwnProperty('defaultRecommendation'))
+         delete theme.defaultRecommendation;
  
        delete theme.type;
        delete theme.valid;

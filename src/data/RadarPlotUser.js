@@ -60,14 +60,14 @@ let recommendations = [];
 // TODO: <--------------------------->
 // TODO: Find every object recursively
 // TODO: <--------------------------->
-function findRecommendations(obj) {
+/*function findRecommendations(obj) {
     if (obj && typeof obj === 'object') { // Si l'objet qu'on passe n'est pas null et c'est de type 'object' => clause de finitude
         if (obj.recommendation) { // Si c'est une recommandation on l'ajoute à notre array
             recommendations.push(obj.recommendation);
         }
         Object.values(obj).forEach(val => findRecommendations(val)); // Et on continue à chercher avec les valeurs du node qu'on a passé :3
     }
-}
+}*/
 
 /**
  * Calling the method
@@ -112,7 +112,7 @@ function findRecommendations(obj) {
 *
 * @returns array
 * */
-function extractData(data) {
+function extractResults(data) {
     return data.map((theme) => {
         let radarPoints;
 
@@ -120,7 +120,6 @@ function extractData(data) {
             radarPoints = 100 - ((theme.totPoints/theme.maxPoints) * 100);
         else
             radarPoints = (theme.totPoints / theme.maxPoints) * 100;
-
 
         return {
             theme: theme.radarName,
@@ -135,7 +134,7 @@ function extractData(data) {
  * @constructor
  */
 export const MyResponsiveRadar = (data) =>{
-    const extractedData = extractData(data.themes);
+    const extractedData = extractResults(data.themes);
 
     return (
         <>
@@ -167,21 +166,22 @@ export const MyResponsiveRadar = (data) =>{
  * @constructor
  */
 // TODO : THIS WAS NOT COMMENTED
-/*const MyResults = (data) => (
-    <>
-        {extractedData.map((data, index) => (
-            <List type="unstyled" key={index}>
-                <li>{data.theme}: {data.totalPoints}</li>
-            </List>
-        ))}
-    </>
-)*/
-
 export const MyResults = (data) => {
+    const extractedData = extractResults(data);
+    return (
+        <>
+            {extractedData.map((data, index) => (
+                <li key={index} style={{marginBottom: '2vh'}}>{data.theme}: {Math.round(data.points*100)/100}</li>
+            ))}
+        </>
+    )
+}
+
+/*export const MyResults = (data) => {
     return data.map((theme, index) =>(
         <li key={index} style={{marginBottom: '2vh'}}>{theme.name}: {theme.totPoints}</li>
     ));
-};
+};*/
 
 /**
  * List of recommendations
@@ -229,6 +229,29 @@ export const MyRecommendations = (data) => {
         </>
     )
 }
+function extractQandA(data) {
+    return data.map((data) =>
+        data.questions.map((question) =>
+            question.answers.map((answer) => {
+                return {
+                    theme: data.name,
+                    question: question.label,
+                    answer: answer
+                };
+            })
+        )).flat(3);
+}
+
+function groupDataByTheme(data) {
+    return extractQandA(data).reduce((acc, cur) => {
+        const { theme, question, answer } = cur;
+        if (!acc[theme]) {
+            acc[theme] = [];
+        }
+        acc[theme].push({ question, answer });
+        return acc;
+    }, {});
+}
 
 /**
  * Table that contains all questions and answers of the log user
@@ -236,31 +259,29 @@ export const MyRecommendations = (data) => {
  * @constructor
  */
 // TODO : THIS WAS NOT COMMENTED
-/*const MyAnswers = () => (
-    <>
-        <Table borderless>
-            <tbody>
-            {Object.entries(groupedData).map(([theme, questions]) => (
-                <React.Fragment key={theme}>
-                    <tr style={{borderBottom: "1px solid black"}}>
-                        <th>{theme}</th>
-                    </tr>
-                    <tr>
-                        <td>{questions[0].question}</td>
-                        <td>{questions[0].answer}</td>
-                    </tr>
-                    {questions.slice(1).map((q) => (
-                        <tr key={q.question}>
-                            <td>{q.question}</td>
-                            <td>{q.answer}</td>
+export const MyAnswers = (data) => {
+    return (
+        <>
+            <Table borderless>
+                <tbody>
+                {Object.entries(groupDataByTheme(data)).map(([theme, questions]) => (
+                    <React.Fragment key={theme}>
+                        <tr style={{borderBottom: "1px solid black"}}>
+                            <th>{theme}</th>
                         </tr>
-                    ))}
-                </React.Fragment>
-            ))}
-            </tbody>
-        </Table>
-    </>
-)*/
+                        {questions.map((q) => (
+                            <tr key={`${q.question}-${q.answer}`}>
+                                <td>{q.question}</td>
+                                <td>{q.answer}</td>
+                            </tr>
+                        ))}
+                    </React.Fragment>
+                ))}
+                </tbody>
+            </Table>
+        </>
+    )
+}
 
 /**
  * Form that contains all information (radar, results, recommendations and Q&A)

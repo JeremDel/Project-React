@@ -3,7 +3,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Timestamp } from "firebase/firestore";
-import {MyRecommendations, MyResponsiveRadar, MyResults} from "./RadarPlotUser";
+import {MyRecommendations, MyResponsiveRadar, MyResults, MyAnswers} from "../data/RadarPlotUser";
 import {Col, List, Row} from "reactstrap";
 
 function RadarFrom() {
@@ -11,6 +11,7 @@ function RadarFrom() {
     const [radar, setRadar] = useState(<></>);
     const [results, setResults] = useState(<></>);
     const [recommendations, setRecommendations] = useState(<></>);
+    const [answers, setAnswers] = useState(<></>);
 
     useEffect(() => {
         // Get current user's id and the reference to the db document with the user's filled questionnaires (aka forms :D)
@@ -23,7 +24,7 @@ function RadarFrom() {
                 const forms = doc.data().questionnaires;
 
                 // TODO: remove this, testing purposes --> We should get the date as an argument
-                const originalDate = new Date('April 25, 2023 8:16:44 PM UTC+2');
+                const originalDate = new Date('April 26, 2023 05:16:45 PM UTC+2');
 
                 // Convert the date to a timestamp, since that's how firestore stores dates
                 const timestampToSearch = Timestamp.fromDate(originalDate);
@@ -65,12 +66,12 @@ function RadarFrom() {
                         break;
                     }
                 }
-                console.log(arrayContainingDatetime);
 
                 // Set the radar with the data of the form
                 setRadar(MyResponsiveRadar(arrayContainingDatetime));
                 setResults(MyResults(arrayContainingDatetime.themes));
                 setRecommendations(MyRecommendations(arrayContainingDatetime.themes));
+                setAnswers(MyAnswers(arrayContainingDatetime.themes));
             } else {
                 console.log('No such document!');
             }
@@ -85,18 +86,24 @@ function RadarFrom() {
                 <h2>Radar</h2>
                 {radar}
             </Row>
-            <Row style={{marginTop: '10vh'}}>
-                <Col md={3}>
+            <Row style={{marginTop: '10vh', justifyContent: "center"}}>
+                <Col md={6}>
                     <h2>Results</h2>
                     <List type={"unstyled"}>
                         {results}
                     </List>
                 </Col>
-                <Col md={9}>
+                <Col md={6} style={{display: "flex", justifyContent: "center", flexDirection: "column"}}>
                     <h2>Recommendations</h2>
                     <List type={"unstyled"}>
                         {recommendations}
                     </List>
+                </Col>
+            </Row>
+            <Row style={{marginTop: "10vh"}}>
+                <Col>
+                    <h2>Your answers</h2>
+                    {answers}
                 </Col>
             </Row>
         </>
