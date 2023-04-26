@@ -8,6 +8,7 @@ import Signup from "./screens/Signup";
 import MyFunction from "./screens/RadarUser";
 import { Container } from "reactstrap";
 import {UserProvider} from "./context/UserContext";
+import GroupRadar from "./screens/RadarPlotGroup";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -69,6 +70,7 @@ function App() {
           <Route path="/radar" element={<Radar />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/radar/:date" element={<MyFunction />} />
+            <Route path="/radarGroup" element={<GroupRadar />} />
         </Routes>
       </Container>
     </div>
