@@ -13,6 +13,7 @@ import {
 } from 'reactstrap';
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
+import firebaseApp from '../initFirebase';
 import "firebase/compat/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 
@@ -66,14 +67,14 @@ function UserForm(){
                 if(userData.photoURL && typeof userData.photoURL === 'string' && userData.photoURL.trim() !== ''){
                     setImageSrc(userData.photoURL);
                 } else {
-                    try {
-                        const storageRef = ref(getStorage(), process.env.DEFAULT_PROFILE_PICTURE_PATH);
-                        getDownloadURL(storageRef).then((url) => {
-                            setImageSrc(url);
-                        });
-                    } catch (error) {
-                        console.log('Error getting default image URL', error);
-                    }
+                    const storage = getStorage();
+                    const myref = ref(storage, 'assets/defaultPfp.png');
+
+                    getDownloadURL(myref).then((url) => {
+                        setImageSrc(url);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
                 }
             } else {
                 console.log('No such document!');
