@@ -10,6 +10,7 @@ const questionnaire = {
       type: "Flow",
       radarName: "Physical activity",
       defaultPoints: 1,
+      defaultRecommendation: "We encourage you to consider getting back into physical activity. Regular physical activity is essential for good health and independence.",
       maxPoints: 6,
       questions: [
         {
@@ -33,9 +34,7 @@ const questionnaire = {
           answers: [
             {
               label: "Yes",
-              goto: "q3",
-              recommendation:
-                "It sounds like the intensity you put into your sport is too low. The next time you train, try to increase it.",
+              goto: "q3"
             },
             {
               label: "No",
@@ -63,10 +62,12 @@ const questionnaire = {
                 text: "It sounds like the intensity you put into your sport is too low. The next time you train, try increasing it. Here are some links to help you.",
                 brochure: [
                   {
-                    link: "brochureIntensiteSport.com",
+                    label: "hepa.ch",
+                    link: "https://www.hepa.ch/fr/bewegungsempfehlungen.html",
                   },
                   {
-                    link: "brochureIntensiteSport.com",
+                    label: "unisante.ch",
+                    link: "https://www.unisante.ch/fr/promotion-prevention/activite-physique",
                   },
                 ],
               },
@@ -85,10 +86,12 @@ const questionnaire = {
                 text: "Here are some useful links to help you get back into physical activity gently.",
                 brochure: [
                   {
-                    link: "brochureProSenectute.com",
+                    label: "concordia.ch",
+                    link: "https://www.concordia.ch/fr/magazin/jeden-tag-sport.html",
                   },
                   {
-                    link: "brochurePasdeRetraitePourMaSante.com",
+                    label: "unisante.ch",
+                    link: "https://www.unisante.ch/fr/promotion-prevention/activite-physique",
                   },
                 ],
               },
@@ -107,6 +110,7 @@ const questionnaire = {
             {
               label: "Yes",
               points: 2,
+              recommendation: "We encourage you to consider getting back into physical activity.",
               goto: "q6"
             },
             {
@@ -122,6 +126,7 @@ const questionnaire = {
             {
               label: "Yes",
               points: 2,
+              recommendation: "We encourage you to consider getting back into physical activity."
             },
             {
               label: "No"
@@ -172,10 +177,11 @@ const questionnaire = {
       maxPoints: 5,
       type: "Single",
       radarName: "Walking speed",
+      info: "Choose one answer",
       questions: [
         {
           label:
-            "Compared to the average walking speed (that of your family, friends and people your age), do you think you walk about... (check one)",
+            "Compared to the average walking speed (that of your family, friends and people your age), do you think you walk about...",
           answers: [
             {
               label: "Slightly slower",
@@ -191,7 +197,7 @@ const questionnaire = {
               label: "At the same speed",
               points: 3,
               recommendation:
-                "Suggestion: You do not need to increase or reduce the indicated time",
+                "Suggestion: You do not need to increase or reduce the indicated time.",
             },
             {
               label: "A little faster",
@@ -221,42 +227,42 @@ const questionnaire = {
             {
               label: "Impossible",
               points: 0,
-              recommendation: "No walking",
+              recommendation: "No walking.",
             },
             {
               label: "1 minute",
               points: 1,
-              recommendation: "No walking",
+              recommendation: "No walking.",
             },
             {
               label: "5 minutes",
               points: 4,
-              recommendation: "5 minutes",
+              recommendation: "Walking time: 5 minutes.",
             },
             {
               label: "15 minutes",
               points: 7,
-              recommendation: "15 minutes",
+              recommendation: "Walking time: 15 minutes.",
             },
             {
               label: "30 minutes",
               points: 10,
-              recommendation: "30 minutes",
+              recommendation: "Walking time: 30 minutes.",
             },
             {
               label: "1 hour",
               points: 13,
-              recommendation: "1h",
+              recommendation: "Walking time: 1 hour.",
             },
             {
               label: "2 hours",
               points: 16,
-              recommendation: "2h",
+              recommendation: "Walking time: 2 hours.",
             },
             {
               label: "3 hours and more",
               points: 19,
-              recommendation: "3h",
+              recommendation: "Walking time: 3 hours.",
             },
           ],
         },
@@ -423,23 +429,23 @@ const questionnaire = {
       ],
       recommendations: [
         {
-          recommendation: "No elevation possible",
+          recommendation: "No elevation possible.",
           minPoint: 0,
         },
         {
-          recommendation: "Only very small differences in elevation possible",
+          recommendation: "Only very small differences in elevation possible.",
           minPoint: 1,
         },
         {
-          recommendation: "Only slight to moderate elevation changes possible",
+          recommendation: "Only slight to moderate elevation changes possible.",
           minPoint: 6,
         },
         {
-          recommendation: "Moderate differences in elevation possible",
+          recommendation: "Moderate differences in elevation possible.",
           minPoint: 11,
         },
         {
-          recommendation: "Moderate differences in elevation possible",
+          recommendation: "Moderate differences in elevation possible.",
           minPoint: 13,
         },
       ],
@@ -501,16 +507,16 @@ const questionnaire = {
       recommendations: [
         {
           recommendation:
-            "No problems with balance or risk of falls; no suggestions necessary",
+            "No problems with balance or risk of falls. No suggestions necessary.",
           minPoint: 0,
         },
         {
           recommendation:
-            "To propose paths without too much difficulty (risk of falls) and accompanied hikes",
+            "You can take trails without too many difficulties (risk of falls) and guided hikes.",
           minPoint: 1,
         },
         {
-          recommendation: "Offer guided hikes or simple paths",
+          recommendation: "You can take simples trails and guided hikes.",
           minPoint: 2,
         },
       ],
@@ -529,12 +535,12 @@ const questionnaire = {
             {
               label: "Yes",
               points: 1,
-              recommendation: "Not exposed roads",
+              recommendation: "Not exposed roads to the void.",
             },
             {
               label: "No",
               points: 0,
-              recommendation: "Possible exposed paths",
+              recommendation: "Exposed roads to the void possible.",
             },
           ],
         },

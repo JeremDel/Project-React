@@ -13,8 +13,10 @@ import {
 } from 'reactstrap';
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
+import firebaseApp from '../initFirebase';
 import "firebase/compat/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import {useNavigate} from "react-router-dom";
 
 function CustomAlert(props){
     return(
@@ -41,6 +43,7 @@ function UserForm(){
 
     const [showAlert, setShowAlert] = useState(false);
     const [alert, setAlert] = useState(<></>);
+    const [imageSrc, setImageSrc] = useState('');
 
     useEffect(() => {
 
@@ -61,6 +64,19 @@ function UserForm(){
                     photoURL: userData.photoURL,
                     sex: userData.sex
                 });
+
+                if(userData.photoURL && typeof userData.photoURL === 'string' && userData.photoURL.trim() !== ''){
+                    setImageSrc(userData.photoURL);
+                } else {
+                    try {
+                        const storageRef = ref(getStorage(), process.env.DEFAULT_PROFILE_PICTURE_PATH);
+                        getDownloadURL(storageRef).then((url) => {
+                            setImageSrc(url);
+                        });
+                    } catch (error) {
+                        console.log('Error getting default image URL', error);
+                    }
+                }
             } else {
                 console.log('No such document!');
             }
@@ -115,19 +131,23 @@ function UserForm(){
                 await uploadBytes(storageRef, pfp);
                 const downloadURL = await getDownloadURL(storageRef);
 
-                const oldImage = ref(storage, userInfo.photoURL);
-                deleteObject(oldImage).then(() => {
-                    setUserInfo({
-                        ...userInfo,
-                        photoURL: downloadURL
-                    });
+                console.log(userInfo.photoURL);
+                if(userInfo.photoURL && typeof userInfo.photoURL === 'string' && userInfo.photoURL.trim() !== ''){
+                    const oldImage = ref(storage, userInfo.photoURL);
+                    deleteObject(oldImage);
+                }
+                setUserInfo({
+                    ...userInfo,
+                    photoURL: downloadURL
                 });
+
 
                 docRef.update({photoURL: downloadURL}).then(() => {
                     setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
                     alertUser();
                 });
 
+                setImageSrc(downloadURL);
                 setImgChange(false);
             } else {
                 setAlert(<CustomAlert color={"info"} message={"Data updated successfully !"}/>);
@@ -167,7 +187,7 @@ function UserForm(){
             <Form style={{marginTop: "10vh"}}>
                 <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
                 <Col md={6}>
-                    <img src={userInfo.photoURL} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
+                    <img src={imageSrc} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
                 </Col>
                 <Col md={6}>
                     <Label htmlFor={"fileChoser"}>Profile picture</Label>
@@ -261,15 +281,17 @@ function UserForm(){
 function TeamManagementForm(){
     // Current user's data
     const [isLeader, setLeader] = useState(false);
+    const [isMember, setMember] = useState(false);
 
     // Current user's group data
     const [groupUid, setGroupUid] = useState('');
-    const [groupName, setGroupName] = useState('');
     const [members, setMembers] = useState([]);
     const [membersNames, setMembersNames] = useState([]);
+    const [leaderName, setLeaderName] = useState('');
 
     // Display variable
     const[content, setContent] = useState([]);
+    const [label, setLabel] = useState(<></>);
 
     // User-to-add data
     const [email, setEmail] = useState('');
@@ -294,8 +316,35 @@ function TeamManagementForm(){
 
                 // Assign the values of the group to the state variables
                 const data = group.docs[0].data();
-                setGroupName(data.name);
                 setMembers(data.members);
+
+                setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {data.name}</h3>);
+            } else {
+                // User is not a leader, but maybe he's a member
+                const query = groups.where('members', "array-contains", id);
+                query.get().then((group) => {
+                    if(!group.empty){
+                        // User belongs to a group
+                        setMember(true);
+                        setGroupUid(group.docs[0].id);
+
+                        const data = group.docs[0].data();
+                        setLabel(<h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Member of the team: {data.name}</h3>);
+
+                        // Store leader's name
+                        const leaderDoc = firebase.firestore().collection('users').doc(data.leader);
+                        leaderDoc.get().then((doc) => {
+                            if(doc.exists){
+                                const leaderData = doc.data();
+                                setLeaderName(leaderData.firstName + ' ' + leaderData.lastName);
+                            }
+                        }).catch((error) => {
+                            console.log('Oh no! There was an error: ', error);
+                        });
+                    }
+                }).catch((error) => {
+                    console.log('Oh no! There was an error: ', error);
+                });
             }
         }).catch((error) => {
             console.log('Oh no! There was an error: ', error);
@@ -303,41 +352,43 @@ function TeamManagementForm(){
     }, []);
 
     useEffect(() => {
-        // For each member in the members list, get their name and add it to the membersnames list
-        const memberNamePromises = members.map((member) => {
-            const memberRef = firebase.firestore().collection('users').doc(member);
-            return memberRef.get().then((member) => {
-                const memberData = member.data();
-                return memberData.firstName;
+        if (isLeader){
+            // For each member in the members list, get their name and add it to the membersnames list
+            const memberNamePromises = members.map((member) => {
+                const memberRef = firebase.firestore().collection('users').doc(member);
+                return memberRef.get().then((member) => {
+                    const memberData = member.data();
+                    return memberData.firstName;
+                }).catch((error) => {
+                    console.log('Oh no! There was an error: ', error);
+                });
+            });
+
+            Promise.all(memberNamePromises).then((memberNames) => {
+                // Once all member names have been retrieved, update the state variables
+                setMembersNames(memberNames);
+
+                const contentItems = memberNames.map((name, index) => (
+                    <>
+                        <Row>
+                            <Col md={9}>
+                                <ListGroupItem key={index}>
+                                    {name}
+                                </ListGroupItem>
+                            </Col>
+                            <Col md={3}>
+                                <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
+                                    Remove
+                                </Button>
+                            </Col>
+                        </Row>
+                    </>
+                ));
+                setContent(contentItems);
             }).catch((error) => {
                 console.log('Oh no! There was an error: ', error);
             });
-        });
-
-        Promise.all(memberNamePromises).then((memberNames) => {
-            // Once all member names have been retrieved, update the state variables
-            setMembersNames(memberNames);
-
-            const contentItems = memberNames.map((name, index) => (
-                <>
-                    <Row>
-                        <Col md={9}>
-                            <ListGroupItem key={index}>
-                                {name}
-                            </ListGroupItem>
-                        </Col>
-                        <Col md={3}>
-                            <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
-                                Remove
-                            </Button>
-                        </Col>
-                    </Row>
-                </>
-            ));
-            setContent(contentItems);
-        }).catch((error) => {
-            console.log('Oh no! There was an error: ', error);
-        });
+        }
     }, [members]);
 
     const deleteMember = (index) => {
@@ -375,17 +426,26 @@ function TeamManagementForm(){
                         setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
                         notifyUser();
                     } else {
-                        const updatedMembers = [...members, uid];
-                        setMembers(updatedMembers);
+                        // Check if user is a leader
+                        const groupQuery = groupCollection.where('leader', "==", uid);
+                        groupQuery.get().then((doc) => {
+                            if(!doc.empty){
+                                setAlert(<CustomAlert color={"danger"} message={"Member is already in a group!"}/>);
+                                notifyUser();
+                            } else {
+                                const updatedMembers = [...members, uid];
+                                setMembers(updatedMembers);
 
-                        const groupRef = firebase.firestore().collection('groups').doc(groupUid);
-                        groupRef.update({
-                            members: updatedMembers
-                        }).then(() => {
-                            setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
-                            notifyUser();
-                        }).catch((exception) => {
-                            console.log('Oh no! There was an error: ', exception);
+                                const groupRef = firebase.firestore().collection('groups').doc(groupUid);
+                                groupRef.update({
+                                    members: updatedMembers
+                                }).then(() => {
+                                    setAlert(<CustomAlert color={"info"} message={"Member added successfully"}/>);
+                                    notifyUser();
+                                }).catch((exception) => {
+                                    console.log('Oh no! There was an error: ', exception);
+                                });
+                            }
                         });
                     }
                     setEmail('');
@@ -408,42 +468,128 @@ function TeamManagementForm(){
     return(
         <>
             {
-                isLeader &&
+                (isLeader || isMember) &&
                 (
-                    <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>Manage my team: {groupName}</h3>
+                    label
                 )
             }
-            <ListGroup>
-                {
-                    isLeader &&
-                    (
-                        content
-                    )
-                }
-            </ListGroup>
-                {
-                    isLeader &&
-                    (
-                        <>
-                            <Row style={{marginTop: '2vh'}}>
-                                <Col md={9}>
-                                    <Input type={"email"} placeholder={"New member's email address"} value={email} onChange={(event) => {setEmail(event.target.value)}}/>
-                                </Col>
-                                <Col md={3}>
-                                    <Button color={"success"} style={{width: '100%'}} onClick={() => {addMember(email)}}>Add member</Button>
-                                </Col>
-                            </Row>
-                        </>
-                    )
-                }
-                {
-                    alertVisible &&
-                    (
-                        alert
-                    )
-                }
+            {
+                isLeader &&
+                (
+                    <>
+                        <ListGroup>
+                            {
+                                isLeader &&
+                                (
+                                    content
+                                )
+                            }
+                        </ListGroup>
+                        <Row style={{marginTop: '2vh'}}>
+                            <Col md={9}>
+                                <Input type={"email"} placeholder={"New member's email address"} value={email} onChange={(event) => {setEmail(event.target.value)}}/>
+                            </Col>
+                            <Col md={3}>
+                                <Button color={"success"} style={{width: '100%'}} onClick={() => {addMember(email)}}>Add member</Button>
+                            </Col>
+                        </Row>
+                    </>
+                )
+            }
+            {
+                isMember &&
+                (
+                    <Row>
+                        <Col md={3}>
+                            <Label>Team manager: </Label>
+                        </Col>
+                        <Col>
+                            <Label>
+                                {leaderName}
+                            </Label>
+                        </Col>
+                    </Row>
+                )
+            }
+            {
+                alertVisible &&
+                (
+                    alert
+                )
+            }
         </>
     );
+}
+
+function CheckUpList() {
+    const navigate = useNavigate();
+
+    // State to store the content that will be rendered at the website
+    const [checkups, setCheckups] = useState(<></>);
+
+    const [isHovered, setIsHovered] = useState(false);
+
+    // Current user's id
+    const uid = firebaseApp.auth().currentUser.uid;
+
+    // Document with all the user's forms
+    const doc = firebaseApp.firestore().collection('userQuestionnaires').doc(uid);
+
+
+    const getRadar = (prettydate) => {
+        const date = new Date(Date.parse(prettydate.replace(/(\d{2})\.(\d{2})\.(\d{4}) @/, '$3-$2-$1T').replace(/\s/, '')));
+
+        navigate(`/radar/${date}`);
+    }
+
+
+    useEffect(() => {
+        doc.get().then((snapshot) => {
+            if(snapshot.exists){
+                // The user has already filled at least 1 checkup
+
+                const checkups = snapshot.data().questionnaires;
+                const dates = checkups.map((checkup, index) => {
+                    const formDate = checkup.datetime.toDate();
+                    const prettyDate = formDate.toLocaleString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        hour12: false,
+                    }).replace('/', '.').replace('/', '.').replace(' ', ' @ ').replace(',', '');
+
+                    console.log('Im here');
+
+                    return(
+                        <ListGroupItem key={index} style={{cursor: 'pointer', textAlign: 'center'}} onClick={() => getRadar(prettyDate)}>
+                            {prettyDate}
+                        </ListGroupItem>
+                    );
+                });
+
+                // Store the formatted dates in the state to be rendered
+                setCheckups(dates);
+            } else {
+
+            }
+        }).catch((error) => {
+            console.log('Oh no! There was an error: ', error);
+        });
+    }, []);
+
+    return(
+        <>
+            <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>My checkups</h3>
+            <ListGroup>
+                {checkups}
+            </ListGroup>
+        </>
+
+    );
+
 }
 
 export default function MyFunction(){
@@ -452,8 +598,11 @@ export default function MyFunction(){
         <>
             <UserForm/>
             <Row style={{marginBottom: "10vh"}}>
-                <Col md={6}>
+                <Col md={7}>
                     <TeamManagementForm/>
+                </Col>
+                <Col md={5}>
+                    <CheckUpList/>
                 </Col>
             </Row>
         </>

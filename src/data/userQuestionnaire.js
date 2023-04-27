@@ -7,7 +7,7 @@ export async function addUserQuestionnaire(questionnaire) {
   const uid = getAuth().currentUser.uid;
 
   const newQuestionnaire = produce(questionnaire, draft => {
-    // Add some informations
+    // Add some information
     // Append the current date to the questionnaire
     draft.datetime = new Date();
  
@@ -36,6 +36,9 @@ export async function addUserQuestionnaire(questionnaire) {
  
        if (theme.hasOwnProperty('defaultPoints'))
          delete theme.defaultPoints;
+
+       if (theme.hasOwnProperty('defaultRecommendation'))
+         delete theme.defaultRecommendation;
  
        delete theme.type;
        delete theme.valid;

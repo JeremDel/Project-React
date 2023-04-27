@@ -74,6 +74,7 @@ export default class QuestionnaireTheme extends React.Component {
 
                 draftState.theme.questions[questionId].selectedOptions = qState;
                 draftState.theme.totPoints = draftState.theme.defaultPoints;
+
                 if (!state.theme.hasOwnProperty('recommendations')) {
                     draftState.theme.recommendations = [];
                 }
@@ -106,6 +107,9 @@ export default class QuestionnaireTheme extends React.Component {
                     draftState.flow.splice(currentQuestionFlowIndex + 1, removingLength);
 
                     draftState.theme.valid = true;
+                    if (draftState.theme.recommendations.length === 0){
+                        draftState.theme.recommendations = [draftState.theme.defaultRecommendation];
+                    }
                 }
             })
 

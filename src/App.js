@@ -1,19 +1,20 @@
 import "./App.css";
-import firebase from "firebase/compat/app";
 import firebaseApp from "./initFirebase";
-import { StyledFirebaseAuth } from "react-firebaseui";
 import { useEffect, useState } from "react";
 import {Routes, Route, Navigate} from "react-router-dom";
 import Questionnaire from "./screens/Questionnaire";
 import Home from "./screens/Home";
 import Signup from "./screens/Signup";
+import MyFunction from "./screens/RadarUser";
 import { Container } from "reactstrap";
+import {UserProvider} from "./context/UserContext";
 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageHeader from "./layout/PageHeader";
 import MyData from "./screens/MyData";
 import Admin from "./screens/Admin";
+import Radar from "./screens/RadarUser";
 
 function App() {
   // Local signed-in state.
@@ -57,13 +58,17 @@ function App() {
   // Signed in - Render app
   return (
     <div className="AppContainer">
-      <PageHeader></PageHeader>
+      <UserProvider>
+        <PageHeader/>
+      </UserProvider>
       <Container>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/checkup" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
+          <Route path="/radar" element={<Radar />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/radar/:date" element={<MyFunction />} />
         </Routes>
       </Container>
     </div>
