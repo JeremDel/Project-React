@@ -2,7 +2,7 @@
 
 # Build and compile app
 FROM node:16 as build
-MAINTAINER Roger Schaer <roger.schaer@hevs.ch>
+MAINTAINER Milena Lonfat <milenalonfat@gmail.com>
 
 # Create app directory
 WORKDIR /usr/src/app
