@@ -150,46 +150,63 @@ function formatMembersData(data) {
     }, []);
 }
 
-export default async function ResponsiveRadarGroup() {
+export default function ResponsiveRadarGroup(data) {
 
-    const[formatedDatad, setFormatedData] = useState([]);
+    const[formattedData, setFormattedData] = useState([]);
+    const[isLoading, setIsLoading] = useState(true);
 
-    useEffect(async () => {
-        const members = ['mtQPlpToEkezKMVPrlnvkHoAzT12', 'FmngqJEmWWbDTciCeTmNQtJBxB43']
+    useEffect(() => {
+        /*const members = ['mtQPlpToEkezKMVPrlnvkHoAzT12', 'FmngqJEmWWbDTciCeTmNQtJBxB43']
         const extractedData = await extractMembersData(members); //points dans les thèmes du dernier truc rempli
         //console.log(extractedData)
         const formatedData = formatMembersData(extractedData)
         console.log(formatedData)
-        setFormatedData(formatedData)
+        setFormatedData(formatedData)*/
+
+        const members = ['mtQPlpToEkezKMVPrlnvkHoAzT12', 'FmngqJEmWWbDTciCeTmNQtJBxB43'];
+        async function fetchData() {
+            const extractedData = await extractMembersData(members);
+            const formatedData = await formatMembersData(extractedData);
+            setFormattedData(formatedData);
+            setIsLoading(false);
+        }
+
+        fetchData();
     }, [])
     return (
         <>
-            <ResponsiveRadar
-                data={formatedDatad}
-                //// Construction data
-                // theme : physical activity
-                // member1 : 16
-                // member2 : 16
-                // theme : pain
-                // member1 : 16
-                // member2 : 16 et ainsi de suite
+            {isLoading ? (
+                <div>Loading...</div>
+            ) : (
+                <div style={{height: '80vh'}}>
+                    <ResponsiveRadar
+                        data={formattedData}
+                        //// Construction data
+                        // theme : physical activity
+                        // member1 : 16
+                        // member2 : 16
+                        // theme : pain
+                        // member1 : 16
+                        // member2 : 16 et ainsi de suite
 
-                //Keys = members[name1, name2] dans user
-                keys={ ["points"] }
-                indexBy= "theme"
-                valueFormat=">-.2f"
-                margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
-                borderColor={{ from: 'color' }}
-                gridLevels={10}
-                gridLabelOffset={36}
-                dotSize={5}
-                dotColor={{ theme: 'background' }}
-                dotBorderWidth={2}
-                colors={{ scheme: 'nivo' }}
-                blendMode="multiply"
-                motionConfig="wobbly"
-                isInteractive={false}
-            />
+                        //Keys = members[name1, name2] dans user
+                        keys={ ["Milena", "sergito"] }
+                        indexBy= "theme"
+                        valueFormat=">-.2f"
+                        margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+                        borderColor={{ from: 'color' }}
+                        gridLevels={10}
+                        gridLabelOffset={36}
+                        dotSize={5}
+                        dotColor={{ theme: 'background' }}
+                        dotBorderWidth={2}
+                        colors={{ scheme: 'nivo' }}
+                        blendMode="multiply"
+                        motionConfig="wobbly"
+                        isInteractive={true}
+                    />
+                </div>
+            )}
         </>
     );
 }
