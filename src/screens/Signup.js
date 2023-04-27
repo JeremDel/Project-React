@@ -91,8 +91,6 @@ const Signup = () => {
                 await uploadBytes(storageRef, profileImage);
                 const downloadURL = await getDownloadURL(storageRef);
                 photoURL = downloadURL;
-            } else {
-                photoURL = 'default_profile_image.jpg';
             }
 
             // Save user data to Firestore

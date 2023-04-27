@@ -29,9 +29,11 @@ export default function PageHeader() {
                 setImageSrc(user.photoURL);
             } else {
                 const storage = getStorage();
-                const defaultImageRef = ref(storage, process.env.DEFAULT_PROFILE_PICTURE_PATH);
+                const defaultImageRef = ref(storage, 'assets/defaultPfp.png');
                 getDownloadURL(defaultImageRef).then((url) => {
                     setImageSrc(url);
+                }).catch((error) => {
+                    console.log(error);
                 });
             }
         }
@@ -87,7 +89,7 @@ export default function PageHeader() {
                                             {user.firstName + ' ' + user.lastName}
                                         </NavbarText>
                                     </DropdownToggle>
-                                    <DropdownMenu right>
+                                    <DropdownMenu end>
                                         <Link to={'/my-data'} style={{textDecoration: 'none'}}><DropdownItem>My profile</DropdownItem></Link>
                                         <DropdownItem divider />
                                         <DropdownItem onClick={handleSignOutClick}>Log out</DropdownItem>

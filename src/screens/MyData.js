@@ -68,14 +68,14 @@ function UserForm(){
                 if(userData.photoURL && typeof userData.photoURL === 'string' && userData.photoURL.trim() !== ''){
                     setImageSrc(userData.photoURL);
                 } else {
-                    try {
-                        const storageRef = ref(getStorage(), process.env.DEFAULT_PROFILE_PICTURE_PATH);
-                        getDownloadURL(storageRef).then((url) => {
-                            setImageSrc(url);
-                        });
-                    } catch (error) {
-                        console.log('Error getting default image URL', error);
-                    }
+                    const storage = getStorage();
+                    const myref = ref(storage, 'assets/defaultPfp.png');
+
+                    getDownloadURL(myref).then((url) => {
+                        setImageSrc(url);
+                    }).catch((error) => {
+                        console.log(error);
+                    })
                 }
             } else {
                 console.log('No such document!');
@@ -279,6 +279,7 @@ function UserForm(){
 }
 
 function TeamManagementForm(){
+    const navigate = useNavigate();
     // Current user's data
     const [isLeader, setLeader] = useState(false);
     const [isMember, setMember] = useState(false);
@@ -290,15 +291,15 @@ function TeamManagementForm(){
     const [leaderName, setLeaderName] = useState('');
 
     // Display variable
-    const[content, setContent] = useState([]);
+    const [content, setContent] = useState([]);
     const [label, setLabel] = useState(<></>);
 
     // User-to-add data
     const [email, setEmail] = useState('');
 
     // Alert
-    const[alert, setAlert] = useState(<></>);
-    const[alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState(<></>);
+    const [alertVisible, setAlertVisible] = useState(false);
 
 
     // Get the values of the group if the user is a leader
@@ -368,22 +369,26 @@ function TeamManagementForm(){
                 // Once all member names have been retrieved, update the state variables
                 setMembersNames(memberNames);
 
-                const contentItems = memberNames.map((name, index) => (
-                    <>
-                        <Row>
-                            <Col md={9}>
-                                <ListGroupItem key={index}>
-                                    {name}
-                                </ListGroupItem>
-                            </Col>
-                            <Col md={3}>
-                                <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
-                                    Remove
-                                </Button>
-                            </Col>
-                        </Row>
-                    </>
-                ));
+                const contentItems = memberNames.map((mName, index) => {
+                    return  (
+
+                        <>
+                            <Row>
+                                <Col md={9}>
+                                    <ListGroupItem key={"MemberIndex-"+index}>
+                                        {mName}
+                                    </ListGroupItem>
+                                </Col>
+                                <Col md={3}>
+                                    <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
+                                        Remove
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </>
+                    )
+                }
+               );
                 setContent(contentItems);
             }).catch((error) => {
                 console.log('Oh no! There was an error: ', error);
@@ -464,6 +469,9 @@ function TeamManagementForm(){
       }, 2500);
     };
 
+    function RadarPlotGroup() {
+        navigate(`/radarGroup/${members}`);
+    }
 
     return(
         <>
@@ -477,6 +485,9 @@ function TeamManagementForm(){
                 isLeader &&
                 (
                     <>
+                        <Row style={{justifyContent: "center", alignItems:"center", marginBottom:"2vh"}}>
+                            <Button onClick={RadarPlotGroup} style={{width: "auto", height: "auto"}}>Display Group Radar</Button>
+                        </Row>
                         <ListGroup>
                             {
                                 isLeader &&
@@ -560,8 +571,6 @@ function CheckUpList() {
                         second: '2-digit',
                         hour12: false,
                     }).replace('/', '.').replace('/', '.').replace(' ', ' @ ').replace(',', '');
-
-                    console.log('Im here');
 
                     return(
                         <ListGroupItem key={index} style={{cursor: 'pointer', textAlign: 'center'}} onClick={() => getRadar(prettyDate)}>
