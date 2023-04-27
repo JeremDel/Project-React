@@ -50,29 +50,31 @@ export default function PageHeader() {
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav className="me-auto" navbar>
-                        <NavItem>
-                            <NavLink href="/checkup">Checkup</NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink href="/my-data">
-                                My data
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink href="/logout">
-                                Logout
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink href="/radar">
-                                Radar
-                            </NavLink>
-                        </NavItem>
-                        <NavItem>
-                            <NavLink href="/admin">
-                                Admin
-                            </NavLink>
-                        </NavItem>
+                        {
+                            user && user.isAdmin ? (<>
+                                <NavItem>
+                                    <NavLink href="/admin">
+                                        Admin
+                                    </NavLink>
+                                </NavItem>
+                            
+                            </>) : (<>
+                                <NavItem>
+                                    <NavLink href="/checkup">Checkup</NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink href="/my-data">
+                                        My data
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink href="/radar">
+                                        Radar
+                                    </NavLink>
+                                </NavItem>                            
+                            </>)
+                        }
+
                     </Nav>
                     {
                         user && (
