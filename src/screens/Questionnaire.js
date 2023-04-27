@@ -2,7 +2,7 @@ import { Nav, NavItem, NavLink } from "reactstrap";
 import React from 'react'; 
 
 import { produce } from "immer"
-import questionnaire from "../data/questionnaire";
+import getQuestionnaire from "../data/questionnaire";
 
 import QuestionnaireTheme from "./QuestionnaireTheme";
 import { Button } from "reactstrap";
@@ -16,17 +16,21 @@ export default class Questionnaire extends React.Component {
     super(props);
 
     this.state = {
-      questionnaire: questionnaire,
+      questionnaire: null,
       currentTheme: 0,
       valid: false
     };
     this.setThemeInfo = this.setThemeInfo.bind(this);
     this.saveQuestionnaire = this.saveQuestionnaire.bind(this);
+
+    getQuestionnaire().then(questionnaire => {
+      this.setState({questionnaire});
+    });
   } 
 
   async saveQuestionnaire() {
     console.log('saveQuestionnaire')
-    addUserQuestionnaire(this.state.questionnaire)
+    let ref = await addUserQuestionnaire(this.state.questionnaire)
   }
 
 
@@ -47,68 +51,76 @@ export default class Questionnaire extends React.Component {
       <div>
         <h1>Checkup</h1>
 
-        <Nav tabs>
+        { this.state.questionnaire ? (
+          <>
+          <Nav tabs>
+            {
+              this.state.questionnaire.themes.map((theme, index) => (
+                  <NavItem key={ 'theme-' + index}>
+                      <NavLink
+                          className={this.state.currentTheme === index ? "active" : ""}
+                          onClick={() => {
+                              this.setState({ currentTheme: index });
+                          }}
+                          role="button"
+                          disabled={ index > 0 && ! this.state.questionnaire.themes[index -  1].valid }
+                      >
+                        {theme.name}
+                      </NavLink>
+                  </NavItem>
+              )) 
+            }
+          </Nav>
+
+          <QuestionnaireTheme 
+            theme={ this.state.questionnaire.themes[this.state.currentTheme] } 
+            themeId={this.state.currentTheme}
+            key={ "active_theme-" + this.state.currentTheme } 
+            onThemeChange={ this.setThemeInfo }></QuestionnaireTheme>
+
+
+          <p>
+            <Button 
+              onClick={ 
+                () => this.setState(state => ({
+                  currentTheme: state.currentTheme - 1
+                }))
+              }
+              disabled={ this.state.currentTheme === 0 }
+              >
+              Previous theme
+            </Button>
+
+            <Button 
+              onClick={ 
+                () => this.setState(state => ({
+                  currentTheme: state.currentTheme + 1
+                }))
+              }
+              disabled={ 
+                ! this.state.questionnaire.themes[this.state.currentTheme].valid
+                ||
+                this.state.currentTheme + 1 === this.state.questionnaire.themes.length
+              }
+              color={this.state.questionnaire.valid ? 'secondary' : 'primary' }
+              >
+              Next theme
+            </Button>
+
+          </p>
+
           {
-            this.state.questionnaire.themes.map((theme, index) => (
-                <NavItem key={ 'theme-' + index}>
-                    <NavLink
-                        className={this.state.currentTheme === index ? "active" : ""}
-                        onClick={() => {
-                            this.setState({ currentTheme: index });
-                        }}
-                        role="button"
-                        disabled={ index > 0 && ! this.state.questionnaire.themes[index -  1].valid }
-                    >
-                      {theme.name}
-                    </NavLink>
-                </NavItem>
-            )) 
+            this.state.questionnaire.valid ? (
+              <Button size="lg" onClick={ this.saveQuestionnaire } disabled={ ! this.state.questionnaire.valid } color="primary">Save</Button>
+            ) : <></>
+            
           }
-        </Nav>
-
-        <QuestionnaireTheme 
-          theme={ this.state.questionnaire.themes[this.state.currentTheme] } 
-          themeId={this.state.currentTheme}
-          key={ "active_theme-" + this.state.currentTheme } 
-          onThemeChange={ this.setThemeInfo }></QuestionnaireTheme>
-
-
-        <p>
-          <Button 
-            onClick={ 
-              () => this.setState(state => ({
-                currentTheme: state.currentTheme - 1
-              }))
-            }
-            disabled={ this.state.currentTheme === 0 }
-            >
-            Previous theme
-          </Button>
-
-          <Button 
-            onClick={ 
-              () => this.setState(state => ({
-                currentTheme: state.currentTheme + 1
-              }))
-            }
-            disabled={ 
-              ! this.state.questionnaire.themes[this.state.currentTheme].valid
-              ||
-              this.state.currentTheme + 1 === this.state.questionnaire.themes.length
-            }
-            color={this.state.questionnaire.valid ? 'secondary' : 'primary' }
-            >
-            Next theme
-          </Button>
-
-        </p>
-
-        {
-          this.state.questionnaire.valid ? (
-            <Button size="lg" onClick={ this.saveQuestionnaire } disabled={ ! this.state.questionnaire.valid } color="primary">Save</Button>
-          ) : <></>
           
-        }
+          </>
+        ) : (
+          <>Loading...</>
+        )}
+
       </div>
     );
   }

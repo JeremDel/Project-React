@@ -2,7 +2,7 @@ import React from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
-import questionnaire from '../data/questionnaire.js';
+import getQuestionnaire from '../data/questionnaire.js';
 import {Nav, NavItem, NavLink} from "reactstrap";
 import {produce} from 'immer';
 
@@ -12,13 +12,16 @@ class Admin extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            questionnaire: questionnaire,
+            questionnaire: null,
             errorMessage: null,
             successMessage: null,
             showSuccessMessage: false,
             active_theme: 0
         };
         this.handleSubmit = this.handleSubmit.bind(this);
+        getQuestionnaire().then(questionnaire => {
+            this.setState({questionnaire});
+        })
     }
 
 
@@ -52,7 +55,9 @@ class Admin extends React.Component {
                 <div>
                     <h2>Admin edition page</h2>
 
-                    <Nav tabs>
+                    { this.state.questionnaire ? (
+                    <>
+                        <Nav tabs>
 
                         {
                             this.state.questionnaire.themes.map((theme, index) => (
@@ -69,12 +74,12 @@ class Admin extends React.Component {
                                 </NavItem>
                             ))
                         }
-                    </Nav>
+                        </Nav>
 
-                    {this.state.errorMessage && (
+                        {this.state.errorMessage && (
                         <p className="text-danger">{this.state.errorMessage}</p>
-                    )}
-                    <form onSubmit={this.handleSubmit}>
+                        )}
+                        <form onSubmit={this.handleSubmit}>
                         {
                             this.state.questionnaire.themes.map((theme, themeIndex) => {
 
@@ -136,8 +141,8 @@ class Admin extends React.Component {
                                 Save
                             </button>
                         </div>
-                    </form>
-                    {this.state.showSuccessMessage && (
+                        </form>
+                        {this.state.showSuccessMessage && (
                         <div
                             className="alert alert-success text-center position-fixed bottom-0 start-50 translate-middle-x"
                             role="alert"
@@ -145,7 +150,11 @@ class Admin extends React.Component {
                         >
                             {this.state.successMessage}
                         </div>
-                    )}
+                        )}
+                    </>
+                    ) : (
+                    <>Loading...</>) 
+                    }
                 </div>
             );
         }
