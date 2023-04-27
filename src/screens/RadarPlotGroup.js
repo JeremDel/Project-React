@@ -61,8 +61,9 @@ function formatMembersData(data) {
     }, []);
 }
 
-export default function ResponsiveRadarGroup(data) {
-    const users = ['70rf9mGkJhehaAqj3S8eGBE6M7F3'];
+export default function ResponsiveRadarGroup() {
+    const givenData = useParams();
+    const users = givenData.members.split(',');
 
     // States that will be used to render the page
     const[formattedData, setFormattedData] = useState([]);
@@ -85,10 +86,6 @@ export default function ResponsiveRadarGroup(data) {
             // Update the states to display the right element
             setFormattedData(formattedData);
             setIsLoading(false);
-
-            console.log(formattedData.lenght === undefined);
-            console.log(formattedData.lenght);
-            console.log(formattedData);
 
             if (formattedData.length !== 0 && formattedData !== undefined){
                 setContent(

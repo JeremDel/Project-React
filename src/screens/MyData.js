@@ -279,6 +279,7 @@ function UserForm(){
 }
 
 function TeamManagementForm(){
+    const navigate = useNavigate();
     // Current user's data
     const [isLeader, setLeader] = useState(false);
     const [isMember, setMember] = useState(false);
@@ -290,15 +291,15 @@ function TeamManagementForm(){
     const [leaderName, setLeaderName] = useState('');
 
     // Display variable
-    const[content, setContent] = useState([]);
+    const [content, setContent] = useState([]);
     const [label, setLabel] = useState(<></>);
 
     // User-to-add data
     const [email, setEmail] = useState('');
 
     // Alert
-    const[alert, setAlert] = useState(<></>);
-    const[alertVisible, setAlertVisible] = useState(false);
+    const [alert, setAlert] = useState(<></>);
+    const [alertVisible, setAlertVisible] = useState(false);
 
 
     // Get the values of the group if the user is a leader
@@ -464,6 +465,9 @@ function TeamManagementForm(){
       }, 2500);
     };
 
+    function RadarPlotGroup() {
+        navigate(`/radarGroup/${members}`);
+    }
 
     return(
         <>
@@ -477,6 +481,9 @@ function TeamManagementForm(){
                 isLeader &&
                 (
                     <>
+                        <Row style={{justifyContent: "center", alignItems:"center", marginBottom:"2vh"}}>
+                            <Button onClick={RadarPlotGroup} style={{width: "auto", height: "auto"}}>Display Group Radar</Button>
+                        </Row>
                         <ListGroup>
                             {
                                 isLeader &&

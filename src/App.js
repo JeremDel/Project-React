@@ -70,7 +70,7 @@ function App() {
           <Route path="/radar" element={<Radar />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/radar/:date" element={<MyFunction />} />
-            <Route path="/radarGroup" element={<GroupRadar />} />
+            <Route path="/radarGroup/:members" element={<GroupRadar />} />
         </Routes>
       </Container>
     </div>
