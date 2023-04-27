@@ -66,9 +66,9 @@ export default function ResponsiveRadarGroup() {
     const users = givenData.members.split(',');
 
     // States that will be used to render the page
-    const[formattedData, setFormattedData] = useState([]);
-    const[isLoading, setIsLoading] = useState(true);
-    const[userNames, setUserNames] = useState([]);
+    const [formattedData, setFormattedData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [userNames, setUserNames] = useState([]);
     const [content, setContent] = useState(<></>);
 
     // At render, get the data for the users and set the states to display the correct elements
@@ -80,67 +80,68 @@ export default function ResponsiveRadarGroup() {
             //Filter the object to not take into consideration the undefined
             extractedData = extractedData.filter(obj => obj !== undefined);
 
-            const formattedData = await formatMembersData(extractedData);
+            const formattedMembersData = await formatMembersData(extractedData);
             setUserNames(await getNames(extractedData));
 
             // Update the states to display the right element
-            setFormattedData(formattedData);
+            setFormattedData(formattedMembersData);
             setIsLoading(false);
-
-            if (formattedData.length !== 0 && formattedData !== undefined){
-                setContent(
-                    <div style={{height: '80vh'}}>
-                        <ResponsiveRadar
-                            data={formattedData}
-                            keys={ userNames }
-                            indexBy= "theme"
-                            valueFormat=">-.2f"
-                            margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
-                            borderColor={{ from: 'color' }}
-                            gridLevels={10}
-                            gridLabelOffset={36}
-                            dotSize={5}
-                            dotColor={{ theme: 'background' }}
-                            dotBorderWidth={2}
-                            colors={{ scheme: 'nivo' }}
-                            blendMode="multiply"
-                            motionConfig="wobbly"
-                            isInteractive={true}
-                            legends={[
-                                {
-                                    anchor: 'top-left',
-                                    direction: 'column',
-                                    translateX: -50,
-                                    translateY: -40,
-                                    itemWidth: 80,
-                                    itemHeight: 30,
-                                    itemTextColor: '#999',
-                                    symbolSize: 12,
-                                    symbolShape: 'circle',
-                                    effects: [
-                                        {
-                                            on: 'hover',
-                                            style: {
-                                                itemTextColor: '#000'
-                                            }
-                                        }
-                                    ]
-                                }
-                            ]}
-                        />
-                    </div>
-                );
-            } else {
-                setContent(
-                    <Row style={{marginTop: '50vh', textAlign: 'center'}}>
-                        <h3>Your group has not yet filled any form</h3>
-                    </Row>
-                );
-            }
         }
-
         fetchData();
     }, [])
+
+    useEffect(() => {
+        if (formattedData.length !== 0 && formattedData !== undefined){
+            setContent(
+                <div style={{height: '80vh'}}>
+                    <ResponsiveRadar
+                        data={formattedData}
+                        keys={ userNames }
+                        indexBy= "theme"
+                        valueFormat=">-.2f"
+                        margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+                        borderColor={{ from: 'color' }}
+                        gridLevels={10}
+                        gridLabelOffset={36}
+                        dotSize={5}
+                        dotColor={{ theme: 'background' }}
+                        dotBorderWidth={2}
+                        colors={{ scheme: 'nivo' }}
+                        blendMode="multiply"
+                        motionConfig="wobbly"
+                        isInteractive={true}
+                        legends={[
+                            {
+                                anchor: 'top-left',
+                                direction: 'column',
+                                translateX: -50,
+                                translateY: -40,
+                                itemWidth: 80,
+                                itemHeight: 30,
+                                itemTextColor: '#999',
+                                symbolSize: 12,
+                                symbolShape: 'circle',
+                                effects: [
+                                    {
+                                        on: 'hover',
+                                        style: {
+                                            itemTextColor: '#000'
+                                        }
+                                    }
+                                ]
+                            }
+                        ]}
+                    />
+                </div>
+            );
+        } else {
+            setContent(
+                <Row style={{marginTop: '50vh', textAlign: 'center'}}>
+                    <h3>Your group has not yet filled any form</h3>
+                </Row>
+            );
+        }
+    }, [formattedData])
 
     return (
         <>

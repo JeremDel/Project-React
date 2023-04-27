@@ -369,22 +369,26 @@ function TeamManagementForm(){
                 // Once all member names have been retrieved, update the state variables
                 setMembersNames(memberNames);
 
-                const contentItems = memberNames.map((name, index) => (
-                    <>
-                        <Row>
-                            <Col md={9}>
-                                <ListGroupItem key={index}>
-                                    {name}
-                                </ListGroupItem>
-                            </Col>
-                            <Col md={3}>
-                                <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
-                                    Remove
-                                </Button>
-                            </Col>
-                        </Row>
-                    </>
-                ));
+                const contentItems = memberNames.map((mName, index) => {
+                    return  (
+
+                        <>
+                            <Row>
+                                <Col md={9}>
+                                    <ListGroupItem key={"MemberIndex-"+index}>
+                                        {mName}
+                                    </ListGroupItem>
+                                </Col>
+                                <Col md={3}>
+                                    <Button style={{width: '100%'}} color={"danger"} onClick={() => deleteMember(index)}>
+                                        Remove
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </>
+                    )
+                }
+               );
                 setContent(contentItems);
             }).catch((error) => {
                 console.log('Oh no! There was an error: ', error);
@@ -567,8 +571,6 @@ function CheckUpList() {
                         second: '2-digit',
                         hour12: false,
                     }).replace('/', '.').replace('/', '.').replace(' ', ' @ ').replace(',', '');
-
-                    console.log('Im here');
 
                     return(
                         <ListGroupItem key={index} style={{cursor: 'pointer', textAlign: 'center'}} onClick={() => getRadar(prettyDate)}>

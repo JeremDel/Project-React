@@ -85,7 +85,7 @@ export default function PageHeader() {
                                             {user.firstName + ' ' + user.lastName}
                                         </NavbarText>
                                     </DropdownToggle>
-                                    <DropdownMenu right>
+                                    <DropdownMenu end>
                                         <Link to={'/my-data'} style={{textDecoration: 'none'}}><DropdownItem>My profile</DropdownItem></Link>
                                         <DropdownItem divider />
                                         <DropdownItem onClick={handleSignOutClick}>Log out</DropdownItem>
