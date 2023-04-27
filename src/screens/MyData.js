@@ -13,7 +13,6 @@ import {
 } from 'reactstrap';
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
-import firebaseApp from '../initFirebase';
 import "firebase/compat/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import {useNavigate} from "react-router-dom";

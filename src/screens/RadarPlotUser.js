@@ -1,9 +1,10 @@
-import React from "react";
+import React, {useRef} from "react";
 import "firebase/compat/auth";
 import "firebase/compat/firestore"; // Import Firestore
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Table} from 'reactstrap';
+import {Button, Table} from 'reactstrap';
 import {ResponsiveRadar} from '@nivo/radar';
+import {toBlob} from "html-to-image";
 
 // Fonctionnement: on sélectionne dans la liste demmy checkup une date qui ouvre cette fenêtre
 
@@ -36,29 +37,58 @@ function extractResults(data) {
 export const MyResponsiveRadar = (data) =>{
     const extractedData = extractResults(data.themes);
 
+    //This part if for share the image of the radar
+    const radarImgRef = useRef();
+    const handleShare = async () => {
+        const newFile = await toBlob(radarImgRef);
+        const data = {
+            files: [
+                new File([newFile], 'myRadar.png', {
+                    type: newFile.type,
+                }),
+            ],
+            title: 'Image',
+            text: 'image',
+        };
+
+        try {
+            if (!navigator.canShare(data)) {
+                console.error("Can't share");
+            }
+            await navigator.share(data);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
         <>
-            <ResponsiveRadar
-                data={extractedData}
-                keys={  ["points"]
-                }
-                indexBy= "theme"
-                valueFormat=">-.2f"
-                margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
-                borderColor={{ from: 'color' }}
-                gridLevels={10}
-                gridLabelOffset={36}
-                dotSize={5}
-                dotColor={{ theme: 'background' }}
-                dotBorderWidth={2}
-                colors={{ scheme: 'nivo' }}
-                blendMode="multiply"
-                motionConfig="wobbly"
-                isInteractive={false}
-            />
+            <Button onClick={handleShare}>Share</Button>
+            <div ref={radarImgRef}>
+                <ResponsiveRadar
+                    data={extractedData}
+                    keys={  ["points"]
+                    }
+                    indexBy= "theme"
+                    valueFormat=">-.2f"
+                    margin={{ top: 70, right: 80, bottom: 40, left: 80 }}
+                    borderColor={{ from: 'color' }}
+                    gridLevels={10}
+                    gridLabelOffset={36}
+                    dotSize={5}
+                    dotColor={{ theme: 'background' }}
+                    dotBorderWidth={2}
+                    colors={{ scheme: 'nivo' }}
+                    blendMode="multiply"
+                    motionConfig="wobbly"
+                    isInteractive={false}
+                />
+            </div>
         </>
     );
 }
+
+
 
 /**
  * List of total points by theme

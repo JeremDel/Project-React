@@ -5,11 +5,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Timestamp } from "firebase/firestore";
 import {MyRecommendations, MyResponsiveRadar, MyResults, MyAnswers} from "./RadarPlotUser";
 import {
-    Col, 
+    Col,
     List,
     ListGroup,
-    ListGroupItem, 
-    Row} from "reactstrap";
+    ListGroupItem,
+    Row
+} from "reactstrap";
 import {useParams} from "react-router-dom";
 
 
@@ -166,6 +167,6 @@ export function CheckUpList() {
 
 export default function MyFunction() {
     return (
-            <RadarFrom/>
-        )
+        <RadarFrom/>
+    )
 };

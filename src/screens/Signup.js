@@ -7,7 +7,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Button, Form, FormGroup, Label, Input, Alert, Col, Row} from 'reactstrap';
-import {addDoc} from "firebase/firestore/lite";
 
 const Signup = () => {
     // Initialize state for form data
