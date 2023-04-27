@@ -34,9 +34,9 @@ export default class Questionnaire extends React.Component {
     this.setState(state => {
       const nextState = produce(state.questionnaire, draftState => {
         draftState.themes[id] = theme;
+        draftState.valid = draftState.themes.find(theme => ! theme.valid) === undefined;
       });
 
-      console.log(nextState)
       return { questionnaire: nextState };
     })
   }
@@ -57,6 +57,7 @@ export default class Questionnaire extends React.Component {
                             this.setState({ currentTheme: index });
                         }}
                         role="button"
+                        disabled={ index > 0 && ! this.state.questionnaire.themes[index -  1].valid }
                     >
                       {theme.name}
                     </NavLink>
@@ -71,7 +72,43 @@ export default class Questionnaire extends React.Component {
           key={ "active_theme-" + this.state.currentTheme } 
           onThemeChange={ this.setThemeInfo }></QuestionnaireTheme>
 
-        <Button onClick={ this.saveQuestionnaire }>Save</Button>
+
+        <p>
+          <Button 
+            onClick={ 
+              () => this.setState(state => ({
+                currentTheme: state.currentTheme - 1
+              }))
+            }
+            disabled={ this.state.currentTheme === 0 }
+            >
+            Previous theme
+          </Button>
+
+          <Button 
+            onClick={ 
+              () => this.setState(state => ({
+                currentTheme: state.currentTheme + 1
+              }))
+            }
+            disabled={ 
+              ! this.state.questionnaire.themes[this.state.currentTheme].valid
+              ||
+              this.state.currentTheme + 1 === this.state.questionnaire.themes.length
+            }
+            color={this.state.questionnaire.valid ? 'secondary' : 'primary' }
+            >
+            Next theme
+          </Button>
+
+        </p>
+
+        {
+          this.state.questionnaire.valid ? (
+            <Button size="lg" onClick={ this.saveQuestionnaire } disabled={ ! this.state.questionnaire.valid } color="primary">Save</Button>
+          ) : <></>
+          
+        }
       </div>
     );
   }
