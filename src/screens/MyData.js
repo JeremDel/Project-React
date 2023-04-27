@@ -532,88 +532,12 @@ function TeamManagementForm(){
     );
 }
 
-function CheckUpList() {
-    const navigate = useNavigate();
-
-    // State to store the content that will be rendered at the website
-    const [checkups, setCheckups] = useState(<></>);
-
-    const [isHovered, setIsHovered] = useState(false);
-
-    // Current user's id
-    const uid = firebaseApp.auth().currentUser.uid;
-
-    // Document with all the user's forms
-    const doc = firebaseApp.firestore().collection('userQuestionnaires').doc(uid);
-
-
-    const getRadar = (prettydate) => {
-        const date = new Date(Date.parse(prettydate.replace(/(\d{2})\.(\d{2})\.(\d{4}) @/, '$3-$2-$1T').replace(/\s/, '')));
-
-        navigate(`/radar/${date}`);
-    }
-
-
-    useEffect(() => {
-        doc.get().then((snapshot) => {
-            if(snapshot.exists){
-                // The user has already filled at least 1 checkup
-
-                const checkups = snapshot.data().questionnaires;
-                const dates = checkups.map((checkup, index) => {
-                    const formDate = checkup.datetime.toDate();
-                    const prettyDate = formDate.toLocaleString('en-GB', {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        hour12: false,
-                    }).replace('/', '.').replace('/', '.').replace(' ', ' @ ').replace(',', '');
-
-                    return(
-                        <ListGroupItem key={index} style={{cursor: 'pointer', textAlign: 'center'}} onClick={() => getRadar(prettyDate)}>
-                            {prettyDate}
-                        </ListGroupItem>
-                    );
-                });
-
-                // Store the formatted dates in the state to be rendered
-                setCheckups(dates);
-            } else {
-
-            }
-        }).catch((error) => {
-            console.log('Oh no! There was an error: ', error);
-        });
-    }, []);
-
-    return(
-        <>
-            <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>My checkups</h3>
-            <ListGroup>
-                {checkups}
-            </ListGroup>
-        </>
-
-    );
-
-}
-
 export default function MyFunction(){
 
     return(
         <>
             <UserForm/>
-            <Row style={{marginBottom: "10vh"}}>
-                <Col md={7}>
-                    <TeamManagementForm/>
-                </Col>
-                <Col md={5}>
-                    <CheckUpList/>
-                </Col>
-            </Row>
+            <TeamManagementForm style={{marginBottom: "10vh"}}/>
         </>
     );
 }
