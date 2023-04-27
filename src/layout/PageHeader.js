@@ -80,22 +80,19 @@ export default function PageHeader() {
                     </Nav>
                     {
                         user && (
-                            <Link to={'/'} style={{textDecoration: 'underline', textDecorationColor: 'gray', listStyleType: 'none', color: 'gray'}}>
-
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret style={{textDecoration: 'underline', textDecorationColor: 'gray', listStyleType: 'none'}}>
-                                        <img src={imageSrc} width={30} height={30} className={"rounded-circle me-2"}/>
-                                        <NavbarText>
-                                            {user.firstName + ' ' + user.lastName}
-                                        </NavbarText>
-                                    </DropdownToggle>
-                                    <DropdownMenu end>
-                                        <Link to={'/my-data'} style={{textDecoration: 'none'}}><DropdownItem>My profile</DropdownItem></Link>
-                                        <DropdownItem divider />
-                                        <DropdownItem onClick={handleSignOutClick}>Log out</DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
-                            </Link>
+                            <UncontrolledDropdown nav inNavbar>
+                                <DropdownToggle nav caret style={{textDecoration: 'underline', textDecorationColor: 'gray', listStyleType: 'none'}}>
+                                    <img src={imageSrc} width={30} height={30} className={"rounded-circle me-2"}/>
+                                    <NavbarText>
+                                        {user.firstName + ' ' + user.lastName}
+                                    </NavbarText>
+                                </DropdownToggle>
+                                <DropdownMenu end>
+                                    <Link to={'/my-data'} style={{textDecoration: 'none'}}><DropdownItem>My profile</DropdownItem></Link>
+                                    <DropdownItem divider />
+                                    <DropdownItem onClick={handleSignOutClick}>Log out</DropdownItem>
+                                </DropdownMenu>
+                            </UncontrolledDropdown>
                         )
                     }
                 </Collapse>
