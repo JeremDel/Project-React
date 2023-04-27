@@ -1,5 +1,6 @@
 import React from 'react';
 import { produce } from "immer"
+import { Button } from "reactstrap";
 
 import QuestionnaireQuestion from './QuestionnaireQuestion';
 
@@ -10,6 +11,7 @@ export default class QuestionnaireTheme extends React.Component {
         this.state = {
             theme: this.props.theme,
             currentQuestion: 0,
+            flow: [0]
         };
         this.onQuestionStateChange = this.onQuestionStateChange.bind(this);
         this.onFlowQuestionChange = this.onFlowQuestionChange.bind(this);
@@ -90,9 +92,19 @@ export default class QuestionnaireTheme extends React.Component {
                 }
 
                 if (answer.goto) {
-                    draftState.currentQuestion = draftState.theme.questions.findIndex(element => element.id === answer.goto);
+                    let nextQuestion = draftState.theme.questions.findIndex(element => element.id === answer.goto);
+                    let currentQuestionFlowIndex = draftState.flow.indexOf(draftState.currentQuestion);
+                    let removingLength = draftState.flow.length - currentQuestionFlowIndex + 1;
+                     
+                    draftState.flow.splice(currentQuestionFlowIndex + 1, removingLength, nextQuestion);
+                    draftState.theme.valid = false;
                 }
                 else {
+                    let currentQuestionFlowIndex = draftState.flow.indexOf(draftState.currentQuestion);
+                    let removingLength = draftState.flow.length - currentQuestionFlowIndex + 1;
+                     
+                    draftState.flow.splice(currentQuestionFlowIndex + 1, removingLength);
+
                     draftState.theme.valid = true;
                 }
             })
@@ -107,12 +119,50 @@ export default class QuestionnaireTheme extends React.Component {
         if (this.props.theme.type === 'Flow') {
             let question = this.props.theme.questions[this.state.currentQuestion];
             return (
-                <QuestionnaireQuestion 
-                    question={ question } 
-                    questionId={ this.state.currentQuestion } 
-                    type="Single" 
-                    key={'q-' + this.state.currentQuestion} 
-                    onStateChange={ this.onFlowQuestionChange } />
+                <>
+                    <QuestionnaireQuestion 
+                        question={ question } 
+                        questionId={ this.state.currentQuestion } 
+                        type="Single" 
+                        key={'q-' + this.state.currentQuestion} 
+                        onStateChange={ this.onFlowQuestionChange } />
+                    
+
+                    <p>
+                        <Button 
+                            onClick={ 
+                                () => this.setState(state => {
+                                    let currentQuestionFlowIndex = state.flow.indexOf(state.currentQuestion);
+                                    return {
+                                        currentQuestion: state.flow[currentQuestionFlowIndex - 1]
+                                    }
+                                })
+                            }
+                            disabled={ this.state.currentQuestion === 0 }
+                            size="sm"
+                            >
+                            Previous question
+                        </Button>
+
+                        <Button 
+                            onClick={ 
+                            () => this.setState(state => {
+                                let currentQuestionFlowIndex = state.flow.indexOf(state.currentQuestion);
+                                return {
+                                    currentQuestion: state.flow[currentQuestionFlowIndex + 1]
+                                }
+                            })
+                            }
+                            disabled={ this.state.flow.indexOf(this.state.currentQuestion) === this.state.flow.length - 1 }
+                            color={ this.state.theme.valid ? 'secondary' : 'primary' }
+                            size="sm"
+                            >
+                            Next question
+                        </Button>
+
+                    </p>
+                </>
+                
             )
         }
         else {
