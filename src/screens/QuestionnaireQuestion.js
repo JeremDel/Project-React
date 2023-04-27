@@ -7,16 +7,10 @@ export default class QuestionnaireQuestion extends React.Component {
         super(props);
 
         let selectedOptions = [];
+        let disabledCheckbox = []
         if (this.props.question.hasOwnProperty('selectedOptions')) {
             selectedOptions = this.props.question.selectedOptions;
         }
-
-        this.state = {
-            selectedOptions: selectedOptions,
-            disabledCheckbox: []
-        };
-        this.toggleRadio = this.toggleRadio.bind(this);
-        this.toggleCheckbox = this.toggleCheckbox.bind(this);
 
         this.exclusiveAnswers = [];
         this.nonExclusiveAnswers = [];
@@ -29,7 +23,29 @@ export default class QuestionnaireQuestion extends React.Component {
                 this.nonExclusiveAnswers.push(index);
             }
         });
-      }
+
+        // Check if we have selected exclusive or non exclusive checkbox
+        if (selectedOptions.length > 0) {
+            let answer = this.props.question.answers[selectedOptions[0]];
+            if (answer.exclusive) {
+                // Disable other checkboxes
+                disabledCheckbox = this.nonExclusiveAnswers;
+            }
+            else {
+                disabledCheckbox = this.exclusiveAnswers;
+            }
+        }
+
+        console.log(disabledCheckbox)
+
+
+        this.state = {
+            selectedOptions: selectedOptions,
+            disabledCheckbox: disabledCheckbox
+        };
+        this.toggleRadio = this.toggleRadio.bind(this);
+        this.toggleCheckbox = this.toggleCheckbox.bind(this);      
+    }
     
       toggleRadio(event) {
         this.setState({ selectedOptions: [ parseInt(event.target.value) ]}, this.triggerNewState);
