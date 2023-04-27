@@ -8,10 +8,15 @@ export default class QuestionnaireTheme extends React.Component {
 
     constructor(props) {
         super(props);
+
+
+        let stateTheme = produce(this.props.theme, draftTheme => {
+            if (draftTheme.type === 'Flow' && ! draftTheme.hasOwnProperty('flow'))
+                draftTheme.flow = [0];
+        });
         this.state = {
-            theme: this.props.theme,
-            currentQuestion: 0,
-            flow: [0]
+            theme: stateTheme,
+            currentQuestion: 0
         };
         this.onQuestionStateChange = this.onQuestionStateChange.bind(this);
         this.onFlowQuestionChange = this.onFlowQuestionChange.bind(this);
@@ -94,17 +99,17 @@ export default class QuestionnaireTheme extends React.Component {
 
                 if (answer.goto) {
                     let nextQuestion = draftState.theme.questions.findIndex(element => element.id === answer.goto);
-                    let currentQuestionFlowIndex = draftState.flow.indexOf(draftState.currentQuestion);
-                    let removingLength = draftState.flow.length - currentQuestionFlowIndex + 1;
+                    let currentQuestionFlowIndex = draftState.theme.flow.indexOf(draftState.currentQuestion);
+                    let removingLength = draftState.theme.flow.length - currentQuestionFlowIndex + 1;
                      
-                    draftState.flow.splice(currentQuestionFlowIndex + 1, removingLength, nextQuestion);
+                    draftState.theme.flow.splice(currentQuestionFlowIndex + 1, removingLength, nextQuestion);
                     draftState.theme.valid = false;
                 }
                 else {
-                    let currentQuestionFlowIndex = draftState.flow.indexOf(draftState.currentQuestion);
-                    let removingLength = draftState.flow.length - currentQuestionFlowIndex + 1;
+                    let currentQuestionFlowIndex = draftState.theme.flow.indexOf(draftState.currentQuestion);
+                    let removingLength = draftState.theme.flow.length - currentQuestionFlowIndex + 1;
                      
-                    draftState.flow.splice(currentQuestionFlowIndex + 1, removingLength);
+                    draftState.theme.flow.splice(currentQuestionFlowIndex + 1, removingLength);
 
                     draftState.theme.valid = true;
                     if (draftState.theme.recommendations.length === 0){
@@ -136,9 +141,9 @@ export default class QuestionnaireTheme extends React.Component {
                         <Button 
                             onClick={ 
                                 () => this.setState(state => {
-                                    let currentQuestionFlowIndex = state.flow.indexOf(state.currentQuestion);
+                                    let currentQuestionFlowIndex = state.theme.flow.indexOf(state.currentQuestion);
                                     return {
-                                        currentQuestion: state.flow[currentQuestionFlowIndex - 1]
+                                        currentQuestion: state.theme.flow[currentQuestionFlowIndex - 1]
                                     }
                                 })
                             }
@@ -151,13 +156,13 @@ export default class QuestionnaireTheme extends React.Component {
                         <Button 
                             onClick={ 
                             () => this.setState(state => {
-                                let currentQuestionFlowIndex = state.flow.indexOf(state.currentQuestion);
+                                let currentQuestionFlowIndex = state.theme.flow.indexOf(state.currentQuestion);
                                 return {
-                                    currentQuestion: state.flow[currentQuestionFlowIndex + 1]
+                                    currentQuestion: state.theme.flow[currentQuestionFlowIndex + 1]
                                 }
                             })
                             }
-                            disabled={ this.state.flow.indexOf(this.state.currentQuestion) === this.state.flow.length - 1 }
+                            disabled={ this.state.theme.flow.indexOf(this.state.currentQuestion) === this.state.theme.flow.length - 1 }
                             color={ this.state.theme.valid ? 'secondary' : 'primary' }
                             size="sm"
                             >
