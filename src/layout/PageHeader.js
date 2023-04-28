@@ -80,8 +80,7 @@ export default function PageHeader() {
                     </Nav>
                     {
                         user && (
-                            <Link to={'/'} style={{textDecoration: 'underline', textDecorationColor: 'gray', listStyleType: 'none', color: 'gray'}}>
-
+                            <Nav navbar>
                                 <UncontrolledDropdown nav inNavbar>
                                     <DropdownToggle nav caret style={{textDecoration: 'underline', textDecorationColor: 'gray', listStyleType: 'none'}}>
                                         <img src={imageSrc} width={30} height={30} className={"rounded-circle me-2"}/>
@@ -95,7 +94,7 @@ export default function PageHeader() {
                                         <DropdownItem onClick={handleSignOutClick}>Log out</DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>
-                            </Link>
+                            </Nav>
                         )
                     }
                 </Collapse>
