@@ -184,7 +184,7 @@ function UserForm(){
     return(
         <>
             <Form style={{marginTop: "10vh"}}>
-                <h2 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h2>
+                <h1 style={{textAlign: "center", marginTop: "7vh", marginBottom: "5vh"}}>My personal data</h1>
                 <Col md={6}>
                     <img src={imageSrc} style={{width: "150px", height: "200px", objectFit: "scale-down"}}/>
                 </Col>
@@ -370,7 +370,6 @@ function TeamManagementForm(){
 
                 const contentItems = memberNames.map((mName, index) => {
                     return  (
-
                         <>
                             <Row>
                                 <Col md={9}>
@@ -495,7 +494,7 @@ function TeamManagementForm(){
                                 )
                             }
                         </ListGroup>
-                        <Row style={{marginTop: '2vh'}}>
+                        <Row style={{marginTop: '2vh', marginBottom: '3vh'}}>
                             <Col md={9}>
                                 <Input type={"email"} placeholder={"New member's email address"} value={email} onChange={(event) => {setEmail(event.target.value)}}/>
                             </Col>
@@ -532,7 +531,6 @@ function TeamManagementForm(){
 }
 
 export default function MyFunction(){
-
     return(
         <>
             <UserForm/>

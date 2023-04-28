@@ -85,7 +85,7 @@ const Home = () => {
                         </Modal>
                     </div>
                 ) : (
-                    <div>
+                    <div style={{marginBottom: '10vh', textAlign:'center'}}>
                         <h1 className="mb-4">Welcome back to the Fitness Check !</h1>
                         <Button color="primary" onClick={handleSignOut}>Log Out</Button>{' '}
                     </div>

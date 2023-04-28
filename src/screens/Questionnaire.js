@@ -51,8 +51,8 @@ export default class Questionnaire extends React.Component {
   
   render() {
     return (
-      <div>
-        <h1>Checkup</h1>
+      <div style={{marginTop: "10vh"}}>
+        <h1 style={{marginBottom: "5vh"}}>Checkup</h1>
 
         { this.state.questionnaire ? (
           <>
@@ -75,7 +75,7 @@ export default class Questionnaire extends React.Component {
             }
           </Nav>
 
-          <QuestionnaireTheme 
+          <QuestionnaireTheme
             theme={ this.state.questionnaire.themes[this.state.currentTheme] } 
             themeId={this.state.currentTheme}
             key={ "active_theme-" + this.state.currentTheme } 

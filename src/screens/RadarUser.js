@@ -90,7 +90,7 @@ function RadarFrom() {
 
     return(
         <>
-            <h2>Radar</h2>
+            <h1 style={{ textAlign: "center", marginTop: "10vh", marginBottom: "5vh" }}>Checkup review</h1>
             <div ref={radarImgRef} style={{height: '100vh'}}>
                 {radar}
             </div>
@@ -174,7 +174,7 @@ export function CheckUpList() {
 
     return(
         <>
-            <h3 style={{textAlign: "center", marginTop: "5vh", marginBottom: "2vh"}}>My checkups</h3>
+            <h1 style={{textAlign: "center", marginTop: "10vh", marginBottom: "5vh"}}>My checkups</h1>
             <ListGroup>
                 {checkups}
             </ListGroup>
