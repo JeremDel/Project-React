@@ -8,9 +8,11 @@ import {produce} from 'immer';
 
 /** Firebase : Collection = questionnaires / document = 1PAYZF2hVLLz9GUyQQYA*/
 
+// Define Admin component
 class Admin extends React.Component {
     constructor(props) {
         super(props);
+        // Initialize component state
         this.state = {
             questionnaire: null,
             errorMessage: null,
@@ -18,7 +20,9 @@ class Admin extends React.Component {
             showSuccessMessage: false,
             active_theme: 0
         };
+        // Bind handleSubmit function to component instance
         this.handleSubmit = this.handleSubmit.bind(this);
+        // Fetch questionnaire data from Firebase and update component state
         getQuestionnaire().then(questionnaire => {
             this.setState({questionnaire});
         })
@@ -27,8 +31,10 @@ class Admin extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
+        // Access Firestore database instance
         const db = firebase.firestore();
         try {
+            // Write questionnaire data to Firestore database
             db.collection('questionnaires')
                 .doc('default')
                 .set(this.state.questionnaire)
@@ -50,7 +56,8 @@ class Admin extends React.Component {
         }
     }
 
-        render() {
+    // Render component UI
+    render() {
             return (
                 <div>
                     <h2>Admin edition page</h2>
@@ -137,7 +144,7 @@ class Admin extends React.Component {
                             })
                         }
                         <div className="d-flex justify-content-end">
-                            <button type="submit" className="btn btn-primary">
+                            <button type="submit" className="btn btn-primary mb-3">
                                 Save
                             </button>
                         </div>
