@@ -68,7 +68,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/checkup" element={<Questionnaire/>} />
           <Route path="/my-data" element={<MyData />} />
-          <Route path="/radar" element={<CheckUpList />} />
+          <Route path="/my-checkups" element={<CheckUpList />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/radar/:date" element={<MyFunction />} />
             <Route path="/radarGroup/:members" element={<GroupRadar />} />

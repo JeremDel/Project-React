@@ -1,9 +1,5 @@
-// import * as fs from 'fs';
 
-// let qs_content = fs.readFileSync("./questionnaire.json");
-// const questionnaire = JSON.parse(qs_content);
 import firebaseApp from '../initFirebase';
-
 
 const questionnaireBackup = {
   themes: [

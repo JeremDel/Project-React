@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Timestamp } from "firebase/firestore";
+
 import {
     Button,
     Col,
@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 import {useParams} from "react-router-dom";
 import "firebase/compat/auth";
-import "firebase/compat/firestore"; // Import Firestore
+import "firebase/compat/firestore";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -26,7 +26,6 @@ import {ResponsiveRadar} from "@nivo/radar";
 function RadarFrom() {
     // Get the date from the parameter
     const givenDate = useParams();
-    const d = Timestamp.fromDate(new Date(givenDate.date));
 
     // State where the radar (from RadarPlotUser.js) will be stored to be displayed
     const [radar, setRadar] = useState(<></>);
@@ -127,8 +126,6 @@ export function CheckUpList() {
     // State to store the content that will be rendered at the website
     const [checkups, setCheckups] = useState(<></>);
 
-    const [isHovered, setIsHovered] = useState(false);
-
     // Current user's id
     const uid = firebaseApp.auth().currentUser.uid;
 
@@ -145,7 +142,6 @@ export function CheckUpList() {
         doc.get().then((snapshot) => {
             if(snapshot.exists){
                 // The user has already filled at least 1 checkup
-
                 const checkups = snapshot.data().questionnaires;
                 const dates = checkups.map((checkup, index) => {
                     const formDate = checkup.datetime.toDate();
@@ -282,7 +278,6 @@ export const MyRecommendations = (data) => {
                     brochures.push(brochure);
                 }
 
-                // TODO: Change this code so that it returns actual links instead of only the text
                 for(let k = 0; k < brochures.length; k++){
                     text = text + ' ' + brochures[k];
                 }

@@ -64,7 +64,7 @@ export default function PageHeader() {
                                 <>
                                     { user ? (<>
                                         <NavItem>
-                                            <NavLink href="/checkup">Checkup</NavLink>
+                                            <NavLink href="/checkup">Do Checkup</NavLink>
                                         </NavItem>
                                         <NavItem>
                                             <NavLink href="/my-data">
@@ -72,8 +72,8 @@ export default function PageHeader() {
                                             </NavLink>
                                         </NavItem>
                                         <NavItem>
-                                            <NavLink href="/radar">
-                                                Radar
+                                            <NavLink href="/my-checkups">
+                                                My Checkups
                                             </NavLink>
                                         </NavItem>                                     
                                     </>) : (<></>)}

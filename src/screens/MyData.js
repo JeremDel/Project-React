@@ -13,7 +13,6 @@ import {
 } from 'reactstrap';
 import React, {useEffect, useState} from 'react';
 import firebase from "firebase/compat/app";
-import firebaseApp from '../initFirebase';
 import "firebase/compat/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import {useNavigate} from "react-router-dom";
@@ -408,7 +407,7 @@ function TeamManagementForm(){
           setAlert(<CustomAlert color={"info"} message={"Member removed successfully"}/>);
           notifyUser();
       }).catch((exception) => {
-          console.log('Crap! There was an error: ', exception);
+          console.log('Oh no! There was an error: ', exception);
       });
     };
 

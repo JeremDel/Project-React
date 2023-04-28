@@ -7,7 +7,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useNavigate } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Button, Form, FormGroup, Label, Input, Alert, Col, Row} from 'reactstrap';
-import {addDoc} from "firebase/firestore/lite";
 
 const Signup = () => {
     // Initialize state for form data
@@ -117,7 +116,6 @@ const Signup = () => {
                 await  groupsCollection.add(newGroup);
             }
 
-            // TODO Redirect to home page after successful registration
             navigate("/");
         } catch (error) {
             setErrorMessage("Oh no! There was an error! Control your inputs!");
