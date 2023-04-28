@@ -60,21 +60,26 @@ export default function PageHeader() {
                                     </NavLink>
                                 </NavItem>
                             
-                            </>) : (<>
-                                <NavItem>
-                                    <NavLink href="/checkup">Checkup</NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink href="/my-data">
-                                        My data
-                                    </NavLink>
-                                </NavItem>
-                                <NavItem>
-                                    <NavLink href="/radar">
-                                        Radar
-                                    </NavLink>
-                                </NavItem>                            
-                            </>)
+                            </>) : (
+                                <>
+                                    { user ? (<>
+                                        <NavItem>
+                                            <NavLink href="/checkup">Checkup</NavLink>
+                                        </NavItem>
+                                        <NavItem>
+                                            <NavLink href="/my-data">
+                                                My data
+                                            </NavLink>
+                                        </NavItem>
+                                        <NavItem>
+                                            <NavLink href="/radar">
+                                                Radar
+                                            </NavLink>
+                                        </NavItem>                                     
+                                    </>) : (<></>)}
+                           
+                                </>
+                            )
                         }
 
                     </Nav>

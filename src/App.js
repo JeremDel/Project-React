@@ -46,6 +46,7 @@ function App() {
   if (!isSignedIn)
     return (
       <div className="App">
+          <PageHeader/>
           <Container>
             <Routes>
               <Route path="/" element={<Home />} />
