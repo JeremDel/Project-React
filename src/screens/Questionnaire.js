@@ -1,5 +1,6 @@
 import { Nav, NavItem, NavLink } from "reactstrap";
 import React from 'react'; 
+import { Navigate } from "react-router-dom";
 
 import { produce } from "immer"
 import getQuestionnaire from "../data/questionnaire";
@@ -18,7 +19,8 @@ export default class Questionnaire extends React.Component {
     this.state = {
       questionnaire: null,
       currentTheme: 0,
-      valid: false
+      valid: false,
+      savedRef: false
     };
     this.setThemeInfo = this.setThemeInfo.bind(this);
     this.saveQuestionnaire = this.saveQuestionnaire.bind(this);
@@ -31,6 +33,7 @@ export default class Questionnaire extends React.Component {
   async saveQuestionnaire() {
     console.log('saveQuestionnaire')
     let ref = await addUserQuestionnaire(this.state.questionnaire)
+    this.setState({ savedRef: ref });
   }
 
 
@@ -121,6 +124,7 @@ export default class Questionnaire extends React.Component {
           <>Loading...</>
         )}
 
+        { this.state.savedRef && <Navigate to={ "/radar/" + this.state.savedRef } replace={true} /> }
       </div>
     );
   }

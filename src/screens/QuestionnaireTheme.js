@@ -71,7 +71,6 @@ export default class QuestionnaireTheme extends React.Component {
     }
 
     onFlowQuestionChange(questionId, qState) {
-        console.log(questionId, qState);
 
         this.setState(state => {
 

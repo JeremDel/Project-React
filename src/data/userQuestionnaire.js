@@ -6,10 +6,12 @@ export async function addUserQuestionnaire(questionnaire) {
   // Get user id
   const uid = getAuth().currentUser.uid;
 
+  const datetime = new Date();
+
   const newQuestionnaire = produce(questionnaire, draft => {
     // Add some information
     // Append the current date to the questionnaire
-    draft.datetime = new Date();
+    draft.datetime = datetime;
  
      // Cleanup user questionnaire unused fields
      draft.themes.forEach(theme => {
@@ -51,19 +53,21 @@ export async function addUserQuestionnaire(questionnaire) {
 
   // Get the document with the user id from the collection userQuestionnaires
   const myDoc = firebaseApp.firestore().collection('userQuestionnaires').doc(uid);
-  myDoc.get().then((doc) => {
-    if(doc.exists){
-      // Update the questionnaires and store them in the document
-      const data = doc.data();
-      const questionnaires = data.questionnaires;
-      const newQuestionnaires = [newQuestionnaire, ...questionnaires];
-      myDoc.update({
-        questionnaires: newQuestionnaires      });
-    } else {
-      // Create the document with the questionnaire
-      myDoc.set({
-        questionnaires: [newQuestionnaire]
-      });
-    }
-  });
+
+  const doc = await myDoc.get();
+
+  if(doc.exists){
+    // Update the questionnaires and store them in the document
+    const data = doc.data();
+    const questionnaires = data.questionnaires;
+    const newQuestionnaires = [newQuestionnaire, ...questionnaires];
+    await myDoc.update({
+      questionnaires: newQuestionnaires      });
+  } else {
+    // Create the document with the questionnaire
+    await myDoc.set({
+      questionnaires: [newQuestionnaire]
+    });
+  }
+  return datetime.getTime();
 }
