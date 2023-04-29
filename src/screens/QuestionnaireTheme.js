@@ -70,6 +70,13 @@ export default class QuestionnaireTheme extends React.Component {
         })
     }
 
+    unsetRemovedFlowQuestions(questions, flow, currentQuestionFlowIndex) {
+        let toUnsetQ = flow.slice(currentQuestionFlowIndex + 1);
+        toUnsetQ.forEach(qIdx => {
+            questions[qIdx].selectedOptions = [];
+        });
+    }
+
     onFlowQuestionChange(questionId, qState) {
 
         this.setState(state => {
@@ -89,28 +96,45 @@ export default class QuestionnaireTheme extends React.Component {
                     draftState.theme.totPoints = answer.points;
                 }
 
-                if (answer.recommendation) {
-                    draftState.theme.recommendations.push(answer.recommendation);
-                }
-                else if (answer.recommendations) {
-                    draftState.theme.recommendations = draftState.theme.recommendations.concat(answer.recommendations)
-                }
 
                 if (answer.goto) {
                     let nextQuestion = draftState.theme.questions.findIndex(element => element.id === answer.goto);
                     let currentQuestionFlowIndex = draftState.theme.flow.indexOf(draftState.currentQuestion);
                     let removingLength = draftState.theme.flow.length - currentQuestionFlowIndex + 1;
                      
+                    this.unsetRemovedFlowQuestions(draftState.theme.questions, draftState.theme.flow, currentQuestionFlowIndex);
                     draftState.theme.flow.splice(currentQuestionFlowIndex + 1, removingLength, nextQuestion);
                     draftState.theme.valid = false;
                 }
                 else {
                     let currentQuestionFlowIndex = draftState.theme.flow.indexOf(draftState.currentQuestion);
                     let removingLength = draftState.theme.flow.length - currentQuestionFlowIndex + 1;
+                    this.unsetRemovedFlowQuestions(draftState.theme.questions, draftState.theme.flow, currentQuestionFlowIndex);
                      
                     draftState.theme.flow.splice(currentQuestionFlowIndex + 1, removingLength);
 
                     draftState.theme.valid = true;
+
+                    // Theme is valid, build recommendations
+                    draftState.theme.recommendations = [];
+                    draftState.theme.questions.forEach((q, qi) => {
+                        
+                        if (q.hasOwnProperty('selectedOptions')) {
+                            q.selectedOptions.forEach(ai => {
+                                let answer = q.answers[ai];
+                                // draftState.totPoints += answer.points;
+    
+                                if (answer.recommendation) {
+                                    draftState.theme.recommendations.push(answer.recommendation);
+                                }
+                                else if (answer.recommendations) {
+                                    draftState.theme.recommendations = draftState.recommendations.concat(answer.recommendations)
+                                }
+                            })
+                        }
+                    })
+
+    
                     if (draftState.theme.recommendations.length === 0){
                         draftState.theme.recommendations = [draftState.theme.defaultRecommendation];
                     }
